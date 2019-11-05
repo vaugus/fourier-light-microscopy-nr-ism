@@ -1,0 +1,13 @@
+qtd_img
+img_1.png
+.
+.
+.
+method
+coeff
+terminal_print
+csv
+window_function
+xw
+yw
+classify

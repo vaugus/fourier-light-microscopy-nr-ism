@@ -1,0 +1,18 @@
+qtd_img
+img path
+method
+coeff
+terminal_print
+csv
+window_function
+xw
+yw
+
+params[0] = qtd
+params[1] = method
+params[2] = coeff
+params[3] = terminal_print
+params[4] = csv
+params[5] = window_function
+params[6] = xw
+params[7] = yw

@@ -1,0 +1,8 @@
+qtd_img
+img_1.png
+.
+.
+.
+method
+colourspace
+elem

@@ -1,0 +1,9 @@
+1
+/home/victor/Documents/msc-image-database/artificial/lena/0.png
+2
+1
+0
+0
+2
+256
+512

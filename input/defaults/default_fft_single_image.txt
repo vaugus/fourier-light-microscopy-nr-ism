@@ -1,0 +1,6 @@
+qtd_img
+img.png
+method
+coeff
+terminal_print
+csv

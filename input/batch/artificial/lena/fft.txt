@@ -1,0 +1,9 @@
+5
+/home/victor/Documents/msc-image-database/artificial/airplane/blurred_3.png
+/home/victor/Documents/msc-image-database/artificial/airplane/blurred_4.png
+/home/victor/Documents/msc-image-database/artificial/airplane/blurred_2.png
+/home/victor/Documents/msc-image-database/artificial/airplane/blurred_1.png
+/home/victor/Documents/msc-image-database/artificial/airplane/sharp.png
+1
+2
+1

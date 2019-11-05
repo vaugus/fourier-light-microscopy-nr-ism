@@ -1,0 +1,2 @@
+1
+/home/victor/Documents/msc-image-database/callisia/resize_test/100.tif

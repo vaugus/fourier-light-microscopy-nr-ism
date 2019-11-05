@@ -1,0 +1,42 @@
+# cmake needs this line
+cmake_minimum_required(VERSION 3.1)
+
+# Enable C++17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+# Define project name
+project(blur-analysis)
+
+# Find OpenCV, you may need to set OpenCV_DIR variable
+# to the absolute path to the directory containing OpenCVConfig.cmake file
+# via the command line or GUI
+find_package(OpenCV REQUIRED)
+find_package(OpenMP REQUIRED)
+
+# If the package has been found, several variables will
+# be set, you can find the full list with descriptions
+# in the OpenCVConfig.cmake file.
+# Print some message showing some of them
+message(STATUS "OpenCV library status:")
+message(STATUS "    config: ${OpenCV_DIR}")
+message(STATUS "    version: ${OpenCV_VERSION}")
+message(STATUS "    libraries: ${OpenCV_LIBS}")
+message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+
+set(NAME_SRC src/main.cpp)
+
+set(NAME_HEADERS
+    lib/src/csv.cpp
+    lib/src/matrix_operations.cpp
+    lib/src/fft_utils.cpp
+    lib/src/fourier_sharpness_base.cpp
+    lib/src/fft.cpp
+    lib/src/fourier_sharpness_analysis.cpp
+)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/src)
+
+add_executable(main ${NAME_SRC} ${NAME_HEADERS})
+
+target_link_libraries(main ${OpenCV_LIBS})
