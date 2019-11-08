@@ -27,12 +27,26 @@ class FourierSharpnessBase {
         FourierSharpnessBase();
         ~FourierSharpnessBase();
 
+        void set_smallest_vector_size(const int smallest_vector_size);
+        int get_smallest_vector_size();
+        
+        void set_center(const unsigned xc, const unsigned yc);
+        cv::Point get_center();
+
+        void set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks);
+        std::vector<cv::Mat> get_radial_vector_masks();
+
+        void set_indices(std::vector<std::vector<cv::Point>> const& indices);
+        std::vector<std::vector<cv::Point>> get_indices();
+
         virtual void fft(cv::Mat const &rgba, cv::Mat &gray_spectrum);
 
         std::vector<double> band_energy(cv::Mat const& spectrum, 
                                         std::vector<cv::Mat> const& ring_masks);
 
         const cv::Mat generate_ring_mask(const int n, std::string const& frequency_band);
+
+        void generate_radial_vectors(const int n);
 
         void draw_radial_vectors(std::vector<cv::Mat> &masked_spectra,
                                  std::vector<std::vector<cv::Point>> &indices,
@@ -60,6 +74,10 @@ class FourierSharpnessBase {
 
         inline static std::vector<double> cosines;
         inline static std::vector<double> sines;
+        inline static std::vector<cv::Mat> radial_vector_masks;
+        inline static std::vector<std::vector<cv::Point>> indices;
+        inline static int smallest_vector_size;
+        inline static cv::Point center;
 
         void initialize_constants(int const step, int const limit);
 };

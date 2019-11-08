@@ -96,11 +96,15 @@ cv::Mat FFTUtils::fft2(cv::Mat const &img) {
 
     // Add to the expanded another plane with zeros
     // this way the result may fit in the source matrix
-    cv::merge(planes, 2, complexI);         
+    cv::merge(planes, 2, complexI);
+
+    // perform dft with the fft algorithm        
     cv::dft(complexI, complexI);
 
+    // split the complex coefficients into two matrices
     cv::split(complexI, planes);
 
+    // compute the magnitude of each complex coefficient
     cv::Mat res;
     cv::magnitude(planes[0], planes[1], planes[0]);
     res = planes[0];

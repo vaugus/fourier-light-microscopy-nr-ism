@@ -25,7 +25,46 @@ FourierSharpnessBase::FourierSharpnessBase() {
 FourierSharpnessBase::~FourierSharpnessBase() {
 }
 
+
+void FourierSharpnessBase::set_smallest_vector_size(int smallest_vector_size) {
+    this->smallest_vector_size = smallest_vector_size;
+}
+
+int FourierSharpnessBase::get_smallest_vector_size() {
+    return this->smallest_vector_size;
+}
+
+
+void FourierSharpnessBase::set_center(const unsigned xc, const unsigned yc) {
+    this->center = cv::Point(xc, yc);
+}
+
+cv::Point FourierSharpnessBase::get_center() {
+    return this->center;
+}
+
+void FourierSharpnessBase::set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks) {
+    this->radial_vector_masks = radial_vector_masks;
+}
+
+
+std::vector<cv::Mat> FourierSharpnessBase::get_radial_vector_masks() {
+    return this->radial_vector_masks;
+}
+
+void FourierSharpnessBase::set_indices(std::vector<std::vector<cv::Point>> const& indices) {
+    this->indices = indices;
+}
+
+
+std::vector<std::vector<cv::Point>> FourierSharpnessBase::get_indices() {
+    return this->indices;
+}
+
+
 void FourierSharpnessBase::initialize_constants(int const step, int const limit) {
+    set_smallest_vector_size(INT_MAX);
+
     // set this->cosines with the sequence {0,5,10,...,110}
     for (int angle = 0; angle <= limit; angle += step) {
         this->cosines.emplace_back(angle);
@@ -175,6 +214,89 @@ const cv::Mat FourierSharpnessBase::generate_ring_mask(const int n, std::string 
  * @return                  A vector representing the coefficient
  *                          cumulative sum array.
  */
+void FourierSharpnessBase::generate_radial_vectors(const int n) {
+
+    const unsigned radius = unsigned(n / 2);
+    
+    set_center(unsigned(n / 2), unsigned(n / 2));
+
+    cv::Point p2;
+
+    // Mat object to hold the indices of non-zero points
+    // among the mask.
+    cv::Mat idx;
+
+    // Mat object where the mask will be applied on one
+    // of the iterations.
+    // cv::Mat tmp;
+
+    // Mat object for finding the indices of the non-zero 
+    // points among the mask.
+    cv::Mat tmp_mask;
+
+    std::vector<cv::Point> tmp_white_points;
+    std::vector<std::vector<cv::Point>> tmp_indices;
+    std::vector<cv::Mat> tmp_radial_vector_masks;
+
+    std::cout << this->cosines.size() << std::endl;
+
+    for (int i = 0; i < this->cosines.size(); i++) {
+
+        // calculate the end point of the vector, based on the angle
+        p2.x = (int)round(center.x + radius * this->cosines[i]);
+        p2.y = (int)round(center.y + radius * this->sines[i]);
+
+        tmp_mask = cv::Mat::zeros(n, n, CV_8UC1);
+        
+        // draw the line 
+        cv::line(tmp_mask,
+                 get_center(),
+                 p2,
+                 cv::Scalar(255, 255, 255),
+                 1,
+                 16);
+
+        // get all the indices from the vector
+        cv::findNonZero(tmp_mask, idx);
+        for (unsigned j = 0; j < idx.total(); j++) {
+            cv::Point non_zero(idx.at<cv::Point>(j).x, idx.at<cv::Point>(j).y);
+            tmp_white_points.emplace_back(non_zero);
+        }
+
+        // get the smallest vector
+        if (idx.rows < get_smallest_vector_size()) {
+            set_smallest_vector_size(idx.rows);
+        }
+
+        tmp_radial_vector_masks.emplace_back(tmp_mask);
+        tmp_indices.emplace_back(tmp_white_points);
+
+        tmp_indices.clear();
+        tmp_mask.release();
+        idx.release();
+    }
+
+    set_radial_vector_masks(tmp_radial_vector_masks);
+    set_indices(indices);
+}
+
+
+/**
+ * Draws a set of radial vectors to a binary mask,
+ * applies the mask and finds the indices of the 
+ * nonzero elements. 
+ *
+ * @param masked_spectra    The FFT spectrum to be analysed.
+ * @param indices           The FFT spectrum to be analysed.
+ * @param spectrum          The FFT spectrum to be analysed.
+ * @param lst               The FFT spectrum to be analysed.
+ * @param xc                The FFT spectrum to be analysed.
+ * @param yc                The FFT spectrum to be analysed.
+ * @param n                 The FFT spectrum to be analysed.
+ *
+ * @return                  A vector representing the coefficient
+ *                          cumulative sum array.
+ */
 void FourierSharpnessBase::draw_radial_vectors(std::vector<cv::Mat> &masked_spectra,
                                                std::vector<std::vector<cv::Point>> &indices,
                                                cv::Mat const &spectrum,
@@ -183,8 +305,6 @@ void FourierSharpnessBase::draw_radial_vectors(std::vector<cv::Mat> &masked_spec
                                                const int yc,
                                                const int n) {
 
-    const cv::Mat mask = cv::Mat::zeros(n, n, CV_8UC1);
-    
     const unsigned radius = unsigned(n / 2);
     
     const cv::Point center(xc, yc);
@@ -211,7 +331,7 @@ void FourierSharpnessBase::draw_radial_vectors(std::vector<cv::Mat> &masked_spec
         p2.x = (int)round(center.x + radius * this->cosines[i]);
         p2.y = (int)round(center.y + radius * this->sines[i]);
 
-        tmp_mask = mask.clone();
+        tmp_mask = cv::Mat::zeros(n, n, CV_8UC1);
         
         // draw the line 
         cv::line(tmp_mask,
@@ -261,6 +381,8 @@ std::vector<double> FourierSharpnessBase::process_radial_vectors(
                                     std::vector<std::vector<cv::Point>> &indices,
                                     unsigned lst) {
 
+
+    // 1363
     // crop all the indices until they have the 'lst' size
     for (auto &elem: indices) {
         while (elem.size() > lst) {

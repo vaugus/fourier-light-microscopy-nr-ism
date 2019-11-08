@@ -16,6 +16,10 @@ class FFT : public FourierSharpnessBase {
 
         void run_batch_fft(std::vector<cv::Mat> &img_vec);
         void sort_energy_distances(std::vector<std::pair<int, double>> &arr);
+
+    private:
+
+        unsigned get_final_spectrum_size(cv::Mat const &img);
 };
 
 #endif

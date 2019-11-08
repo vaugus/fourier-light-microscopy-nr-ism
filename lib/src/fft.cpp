@@ -3,8 +3,9 @@
 #include "../include/csv.hpp"
 #include "../include/matrix_operations.hpp"
 #include "../include/constants.hpp"
-// #include "../include/helper.hpp"
+#include <ctime>
 
+using namespace std;
 
 /**
  * Implementation of the FFT class.
@@ -22,14 +23,18 @@
  */
 void FFT::run_batch_fft(std::vector<cv::Mat> &img_vec) {
 
-    cv::Mat gray_spectrum;
+
+    const unsigned n = get_final_spectrum_size(img_vec[0]);
+    FourierSharpnessBase::generate_radial_vectors(n);
 
     CSVWriter *writer = new CSVWriter();
     writer->set_delimiter(",");
     writer->set_linecount(0);
 
+    cv::Mat gray_spectrum;
     std::vector<std::vector<double>> coefficients;
     std::vector<double> tmp;
+
     for (auto const& rgba : img_vec) {
         // perform the fast fourier transform
         FourierSharpnessBase::fft(rgba, gray_spectrum);
@@ -59,4 +64,8 @@ void FFT::sort_energy_distances(std::vector<std::pair<int, double>> &arr) {
 
     // sort the maps according to the mean 
     sort(arr.begin(), arr.end(), comparator);
+}
+
+unsigned FFT::get_final_spectrum_size(cv::Mat const &img) {
+    return std::max(img.rows, img.cols);
 }

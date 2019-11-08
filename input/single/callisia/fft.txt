@@ -1,2 +1,2 @@
 1
-/home/victor/Documents/msc-image-database/callisia/48.tif
+/home/victor/Documents/msc-image-database/callisia/rgb/50/48.tif
