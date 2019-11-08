@@ -36,7 +36,7 @@ class FourierSharpnessBase {
         void set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks);
         std::vector<cv::Mat> get_radial_vector_masks();
 
-        void set_indices(std::vector<std::vector<cv::Point>> const& indices);
+        void set_indices(std::vector<std::vector<cv::Point>> &indices);
         std::vector<std::vector<cv::Point>> get_indices();
 
         virtual void fft(cv::Mat const &rgba, cv::Mat &gray_spectrum);
@@ -56,9 +56,11 @@ class FourierSharpnessBase {
                                  const int yc,
                                  const int n);
 
-        std::vector<double> process_radial_vectors(std::vector<cv::Mat> const &masked_spectra,
+        std::vector<double> process_radial_vectors(std::vector<cv::Mat> &masked_spectra,
                                                    std::vector<std::vector<cv::Point>> &indices,
                                                    unsigned lst);
+
+        std::vector<double> process_radial_vectors(std::vector<cv::Mat> &masked_spectra);
         
         const std::vector<cv::Mat> assemble_ring_mask_vector(const int n);
 
@@ -70,6 +72,8 @@ class FourierSharpnessBase {
 
         std::vector<double> get_fft_coeff_vector(cv::Mat const &spectrum);
 
+        std::vector<double> teste(cv::Mat const &spectrum);
+
     private:
 
         inline static std::vector<double> cosines;
@@ -80,6 +84,9 @@ class FourierSharpnessBase {
         inline static cv::Point center;
 
         void initialize_constants(int const step, int const limit);
+
+        std::vector<cv::Mat> apply_radial_vector_masks(cv::Mat const &spectrum);
+        void crop_indices();
 };
 
 #endif

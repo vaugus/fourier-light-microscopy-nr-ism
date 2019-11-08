@@ -22,8 +22,7 @@ using namespace std;
  * @param params    The image to suffer the analysis.
  */
 void FFT::run_batch_fft(std::vector<cv::Mat> &img_vec) {
-
-
+    // Generate the radial vectors for all spectra
     const unsigned n = get_final_spectrum_size(img_vec[0]);
     FourierSharpnessBase::generate_radial_vectors(n);
 
@@ -40,7 +39,8 @@ void FFT::run_batch_fft(std::vector<cv::Mat> &img_vec) {
         FourierSharpnessBase::fft(rgba, gray_spectrum);
 
         // extract the coefficient vector
-        tmp = FourierSharpnessBase::get_fft_coeff_vector(gray_spectrum);
+        tmp = FourierSharpnessBase::teste(gray_spectrum);
+        // tmp = FourierSharpnessBase::get_fft_coeff_vector(gray_spectrum);
 
         coefficients.emplace_back(tmp);
 
@@ -67,5 +67,5 @@ void FFT::sort_energy_distances(std::vector<std::pair<int, double>> &arr) {
 }
 
 unsigned FFT::get_final_spectrum_size(cv::Mat const &img) {
-    return std::max(img.rows, img.cols);
+    return std::max(img.rows, img.cols) / 2;
 }

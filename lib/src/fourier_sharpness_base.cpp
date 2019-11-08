@@ -52,7 +52,7 @@ std::vector<cv::Mat> FourierSharpnessBase::get_radial_vector_masks() {
     return this->radial_vector_masks;
 }
 
-void FourierSharpnessBase::set_indices(std::vector<std::vector<cv::Point>> const& indices) {
+void FourierSharpnessBase::set_indices(std::vector<std::vector<cv::Point>> &indices) {
     this->indices = indices;
 }
 
@@ -198,6 +198,13 @@ const cv::Mat FourierSharpnessBase::generate_ring_mask(const int n, std::string 
 }
 
 
+void FourierSharpnessBase::crop_indices() {
+    // crop all the indices until they have the 'lst' size
+    for (auto &elem: get_indices()) {
+        elem.resize(get_smallest_vector_size());
+    }
+}
+
 /**
  * Draws a set of radial vectors to a binary mask,
  * applies the mask and finds the indices of the 
@@ -215,20 +222,17 @@ const cv::Mat FourierSharpnessBase::generate_ring_mask(const int n, std::string 
  *                          cumulative sum array.
  */
 void FourierSharpnessBase::generate_radial_vectors(const int n) {
+    const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
 
     const unsigned radius = unsigned(n / 2);
     
-    set_center(unsigned(n / 2), unsigned(n / 2));
+    set_center(radius, radius);
 
     cv::Point p2;
 
     // Mat object to hold the indices of non-zero points
     // among the mask.
     cv::Mat idx;
-
-    // Mat object where the mask will be applied on one
-    // of the iterations.
-    // cv::Mat tmp;
 
     // Mat object for finding the indices of the non-zero 
     // points among the mask.
@@ -238,15 +242,13 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
     std::vector<std::vector<cv::Point>> tmp_indices;
     std::vector<cv::Mat> tmp_radial_vector_masks;
 
-    std::cout << this->cosines.size() << std::endl;
-
     for (int i = 0; i < this->cosines.size(); i++) {
 
         // calculate the end point of the vector, based on the angle
         p2.x = (int)round(center.x + radius * this->cosines[i]);
         p2.y = (int)round(center.y + radius * this->sines[i]);
 
-        tmp_mask = cv::Mat::zeros(n, n, CV_8UC1);
+        tmp_mask = zeros.clone();
         
         // draw the line 
         cv::line(tmp_mask,
@@ -256,11 +258,14 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
                  1,
                  16);
 
+
         // get all the indices from the vector
         cv::findNonZero(tmp_mask, idx);
-        for (unsigned j = 0; j < idx.total(); j++) {
-            cv::Point non_zero(idx.at<cv::Point>(j).x, idx.at<cv::Point>(j).y);
-            tmp_white_points.emplace_back(non_zero);
+        for (int i = 0; i < idx.rows; i++) {
+            const cv::Point* Mi = idx.ptr<cv::Point>(i);
+            for(int j = 0; j < idx.cols; j++) {
+                tmp_white_points.emplace_back(Mi[j]);
+            }
         }
 
         // get the smallest vector
@@ -278,136 +283,21 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
 
     set_radial_vector_masks(tmp_radial_vector_masks);
     set_indices(indices);
+    crop_indices();
 }
 
 
-/**
- * Draws a set of radial vectors to a binary mask,
- * applies the mask and finds the indices of the 
- * nonzero elements. 
- *
- * @param masked_spectra    The FFT spectrum to be analysed.
- * @param indices           The FFT spectrum to be analysed.
- * @param spectrum          The FFT spectrum to be analysed.
- * @param lst               The FFT spectrum to be analysed.
- * @param xc                The FFT spectrum to be analysed.
- * @param yc                The FFT spectrum to be analysed.
- * @param n                 The FFT spectrum to be analysed.
- *
- * @return                  A vector representing the coefficient
- *                          cumulative sum array.
- */
-void FourierSharpnessBase::draw_radial_vectors(std::vector<cv::Mat> &masked_spectra,
-                                               std::vector<std::vector<cv::Point>> &indices,
-                                               cv::Mat const &spectrum,
-                                               int &lst,
-                                               const int xc,
-                                               const int yc,
-                                               const int n) {
+std::vector<cv::Mat> FourierSharpnessBase::apply_radial_vector_masks(cv::Mat const &spectrum) {
+    std::vector<cv::Mat> masked_spectra;
+    cv::Mat tmp_spectrum;
 
-    const unsigned radius = unsigned(n / 2);
-    
-    const cv::Point center(xc, yc);
-
-    cv::Point p2;
-
-    // Mat object to hold the indices of non-zero points
-    // among the mask.
-    cv::Mat idx;
-
-    // Mat object where the mask will be applied on one
-    // of the iterations.
-    cv::Mat tmp;
-
-    // Mat object for finding the indices of the non-zero 
-    // points among the mask.
-    cv::Mat tmp_mask;
-
-    std::vector<cv::Point> vec;
-
-    for (int i = 0; i < this->cosines.size(); i++) {
-
-        // calculate the end point of the vector, based on the angle
-        p2.x = (int)round(center.x + radius * this->cosines[i]);
-        p2.y = (int)round(center.y + radius * this->sines[i]);
-
-        tmp_mask = cv::Mat::zeros(n, n, CV_8UC1);
-        
-        // draw the line 
-        cv::line(tmp_mask,
-                 center,
-                 p2,
-                 cv::Scalar(255, 255, 255),
-                 1,
-                 16);
-
-        // apply the mask
-        spectrum.copyTo(tmp, tmp_mask);
-
-        // get all the indices from the vector
-        cv::findNonZero(tmp_mask, idx);
-        for (unsigned j = 0; j < idx.total(); j++) {
-            cv::Point p(idx.at<cv::Point>(j).x, idx.at<cv::Point>(j).y);
-            vec.emplace_back(p);
-        }
-
-        // get the smallest vector
-        if (idx.rows < lst) {
-            lst = idx.rows;
-        }
-
-        masked_spectra.emplace_back(tmp);
-        indices.emplace_back(vec);
-
-        vec.clear();
-        tmp.release();
-        tmp_mask.release();
-        idx.release();
-    }
-}
-
-
-/**
- * Pads the image with the specified value.
- *
- * @param masked_spectra            The image to be transformed.
- * @param indices     The padding value.
- * @param lst      The padding value.
- *
- * @return          The padded image.
- */
-std::vector<double> FourierSharpnessBase::process_radial_vectors(
-                                    std::vector<cv::Mat> const &masked_spectra,
-                                    std::vector<std::vector<cv::Point>> &indices,
-                                    unsigned lst) {
-
-
-    // 1363
-    // crop all the indices until they have the 'lst' size
-    for (auto &elem: indices) {
-        while (elem.size() > lst) {
-            elem.pop_back();
-        }
+    for (auto const& mask : get_radial_vector_masks()) {
+        spectrum.copyTo(tmp_spectrum, mask);
+        masked_spectra.emplace_back(tmp_spectrum);
+        tmp_spectrum.release();
     }
 
-    // obtain all the masked pixels and sum them
-    std::vector<double> sum(lst);
-
-    for (auto &elem : indices) {
-        for (auto &spectra : masked_spectra) {
-            for (unsigned i = 0; i < elem.size(); i++) {
-                sum[i] += spectra.at<double>(elem[i]);
-            }
-        }
-    }
-
-    // divide all elements by the number of vectors taken
-    const double k = indices.size();
-    std::transform(sum.begin(), sum.end(), sum.begin(), 
-        [k](double& c) { return c / k; });
-
-    indices.clear();
-    return sum;
+    return masked_spectra;
 }
 
 
@@ -498,6 +388,27 @@ void FourierSharpnessBase::write_mat_to_file(cv::Mat& m, std::string const &file
 }
 
 
+std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
+    std::vector<double> sum(get_smallest_vector_size());
+    
+    // obtain all the masked pixels and sum them
+    for (auto const& elem : get_indices()) {
+        for (auto const& spectra : masked_spectra) {
+            for (unsigned i = 0; i < elem.size(); i++) {
+                sum[i] += spectra.at<double>(elem[i]);
+            }
+        }
+    }
+
+    // divide all elements by the number of vectors taken
+    const double k = get_indices().size();
+    std::transform(sum.begin(), sum.end(), sum.begin(), 
+        [k](double& c) { return c / k; });
+
+    return sum;
+} 
+
+
 /**
  * Retrieves the sum of each element of eight radii 
  * of a spectrum in the form of vector<double>.
@@ -507,27 +418,9 @@ void FourierSharpnessBase::write_mat_to_file(cv::Mat& m, std::string const &file
  * @return              A vector representing the coefficient
  *                      cumulative sum array.
  */
-std::vector<double> FourierSharpnessBase::get_fft_coeff_vector(cv::Mat const &spectrum) {
-    const unsigned n = spectrum.rows;
+std::vector<double> FourierSharpnessBase::teste(cv::Mat const &spectrum) {
+    std::vector<cv::Mat> masked_spectra = apply_radial_vector_masks(spectrum);
 
-    const unsigned xc = n / 2;
-    const unsigned yc = n / 2;
-
-    std::vector<cv::Mat> masked_spectra;
-    std::vector<std::vector<cv::Point>> indices;
-    int lst = INT_MAX;
-
-    draw_radial_vectors(masked_spectra,
-                        indices,
-                        spectrum,
-                        lst,
-                        xc,
-                        yc,
-                        n);  
-
-    std::vector<double> sum = process_radial_vectors(masked_spectra, indices, lst);
-
-    masked_spectra.clear();
-    indices.clear();
+    std::vector<double> sum = process_radial_vectors(masked_spectra);
     return sum;
 }
