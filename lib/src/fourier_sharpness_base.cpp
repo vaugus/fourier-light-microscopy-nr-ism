@@ -199,10 +199,13 @@ const cv::Mat FourierSharpnessBase::generate_ring_mask(const int n, std::string 
 
 
 void FourierSharpnessBase::crop_indices() {
+    std::vector<std::vector<cv::Point>> indices = get_indices();
     // crop all the indices until they have the 'lst' size
-    for (auto &elem: get_indices()) {
+    for (auto &elem: indices) {
         elem.resize(get_smallest_vector_size());
     }
+
+    set_indices(indices);
 }
 
 /**
@@ -276,13 +279,13 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
         tmp_radial_vector_masks.emplace_back(tmp_mask);
         tmp_indices.emplace_back(tmp_white_points);
 
-        tmp_indices.clear();
+        tmp_white_points.clear();
         tmp_mask.release();
         idx.release();
     }
 
     set_radial_vector_masks(tmp_radial_vector_masks);
-    set_indices(indices);
+    set_indices(tmp_indices);
     crop_indices();
 }
 
@@ -390,9 +393,9 @@ void FourierSharpnessBase::write_mat_to_file(cv::Mat& m, std::string const &file
 
 std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
     std::vector<double> sum(get_smallest_vector_size());
-    
+
     // obtain all the masked pixels and sum them
-    for (auto const& elem : get_indices()) {
+    for (auto const elem : get_indices()) {
         for (auto const& spectra : masked_spectra) {
             for (unsigned i = 0; i < elem.size(); i++) {
                 sum[i] += spectra.at<double>(elem[i]);
@@ -400,6 +403,7 @@ std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv:
         }
     }
 
+    
     // divide all elements by the number of vectors taken
     const double k = get_indices().size();
     std::transform(sum.begin(), sum.end(), sum.begin(), 
