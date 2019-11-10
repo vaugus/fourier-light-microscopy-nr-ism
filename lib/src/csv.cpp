@@ -85,15 +85,13 @@ void CSVWriter::write_single_fft_coeff_csv(std::vector<double> const &gray_data)
 
 void CSVWriter::write_fft_descriptor_dataset(std::vector<std::vector<double>> const &gray_data) {
 	// Adding header to CSV File
-	// const std::vector<int> header = {};
-
 	std::vector<int> header(gray_data[0].size());
     std::iota(header.begin(), header.end(), 0);
 
 	add_data_in_row(header.begin(), header.end());
 
-	for (unsigned i = 0; i < gray_data.size(); i++) {
-		add_data_in_row(gray_data[i].begin(), gray_data[i].end());
+	for (auto const& elem : gray_data) {
+		add_data_in_row(elem.begin(), elem.end());
 	}
 }
 

@@ -72,7 +72,7 @@ class FourierSharpnessBase {
 
         std::vector<double> get_fft_coeff_vector(cv::Mat const &spectrum);
 
-        std::vector<double> teste(cv::Mat const &spectrum);
+        std::vector<double> compute_descriptor(cv::Mat const &spectrum);
 
     private:
 

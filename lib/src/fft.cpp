@@ -39,8 +39,7 @@ void FFT::run_batch_fft(std::vector<cv::Mat> &img_vec) {
         FourierSharpnessBase::fft(rgba, gray_spectrum);
 
         // extract the coefficient vector
-        tmp = FourierSharpnessBase::teste(gray_spectrum);
-        // tmp = FourierSharpnessBase::get_fft_coeff_vector(gray_spectrum);
+        tmp = FourierSharpnessBase::compute_descriptor(gray_spectrum);
 
         coefficients.emplace_back(tmp);
 

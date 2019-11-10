@@ -261,7 +261,6 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
                  1,
                  16);
 
-
         // get all the indices from the vector
         cv::findNonZero(tmp_mask, idx);
         for (int i = 0; i < idx.rows; i++) {
@@ -402,7 +401,6 @@ std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv:
             }
         }
     }
-
     
     // divide all elements by the number of vectors taken
     const double k = get_indices().size();
@@ -422,9 +420,8 @@ std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv:
  * @return              A vector representing the coefficient
  *                      cumulative sum array.
  */
-std::vector<double> FourierSharpnessBase::teste(cv::Mat const &spectrum) {
+std::vector<double> FourierSharpnessBase::compute_descriptor(cv::Mat const &spectrum) {
     std::vector<cv::Mat> masked_spectra = apply_radial_vector_masks(spectrum);
-
     std::vector<double> sum = process_radial_vectors(masked_spectra);
     return sum;
 }
