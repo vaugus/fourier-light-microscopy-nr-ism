@@ -125,33 +125,3 @@ cv::Mat FFTUtils::fft2(cv::Mat const &img) {
     res = fft_shift(res);
     return res;
 }
-
-
-/**
- * Transforms the FFT resulting spectrum into a real valued
- * 2D vector.
- *
- * @param spectrum      The result of a FFT procedure.
- *
- * @return              A 2D real valued vector with the coefficients.
- */
-std::vector<std::vector<double>> FFTUtils::fft2array(cv::Mat const &spectrum) {
-    const int m = spectrum.rows;
-    const int n = spectrum.cols;
-
-    std::vector<std::vector<double>> array(m * n);
-    std::vector<double> tmp;
-    double val = 0;
-
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            val = spectrum.at<double>(i, j);
-            tmp.push_back(val);
-        }
-
-        array[i] = tmp;
-        tmp.clear();
-    }
-
-    return array;
-}

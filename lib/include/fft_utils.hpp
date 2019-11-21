@@ -26,7 +26,6 @@ class FFTUtils {
 
         cv::Mat fft_shift(cv::Mat const &spectrum);
         cv::Mat fft2(cv::Mat const &img);
-        std::vector<std::vector<double>> fft2array(cv::Mat const &spectrum);
 };
 
 #endif

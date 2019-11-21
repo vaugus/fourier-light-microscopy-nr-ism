@@ -1,3 +1,16 @@
+/**
+ * \file fourier_sharpness_base.hpp
+ *
+ * \brief Header file for class FourierSharpnessBase.
+ *
+ * Header file with a class for operations concerning 
+ * the blur analysis in the Fourier domain.
+ *
+ * \author Victor Augusto 
+ * \version 1.0
+ * \date 2019-11-21
+ */
+
 #ifndef FOURIER_SHARPNESS_BASE_HPP
 #define FOURIER_SHARPNESS_BASE_HPP
 
@@ -14,37 +27,77 @@
 
 
 /**
- * Header file with a class for operations concerning 
- * the blur analysis in the Fourier domain.
+ * \class FourierSharpnessBase
  *
- * @author Victor Augusto
- * @version 1.0
+ * \brief Organizes the Fourier IQA in methods
+ *
+ * This class contains operations concerning the Fourier Transform
+ * based image quality assessment procedure. It is responsible for
+ * organizing the descriptor generation in comprehensible methods.
+ *
+ * \author Victor Augusto
+ * \version 1.0
  */
 class FourierSharpnessBase {
 
     public:
 
+        /** \brief Instantiates a new FourierSharpnessBase object. */
         FourierSharpnessBase();
+
+        /** \brief Destroys a FourierSharpnessBase instance. */
         ~FourierSharpnessBase();
 
+        /** \param smallest_vector_size     The smallest vector size to set.*/
         void set_smallest_vector_size(const int smallest_vector_size);
+        
+        /** \return current smallest vector size.*/
         int get_smallest_vector_size();
         
+        /** 
+         * \param xc    The x coordinate of the center point
+         * \param yc    The y coordinate of the center point.
+         */
         void set_center(const unsigned xc, const unsigned yc);
+
+        /** 
+         * \return     A cv::Point object that represents the center of
+         *             the current image. 
+         */
         cv::Point get_center();
 
+        /** 
+         * \param xc    The x coordinate of the center point
+         * \param yc    The y coordinate of the center point.
+         */
         void set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks);
+        
+        /** 
+         * \return      A std::vector of cv::Mat objects with the radial vector masks
+         *              of the current dimensions.
+         */
         std::vector<cv::Mat> get_radial_vector_masks();
 
+        /** 
+         * \param indices   Two-dimensional std::vector of cv::Point with the indices
+         *                  of white points in a radial vector mask.  
+         */
         void set_indices(std::vector<std::vector<cv::Point>> &indices);
+
+        /** 
+         * \return      A two-dimensional std::vector of cv::Point with the current 
+         *              indices of white points. 
+         */
         std::vector<std::vector<cv::Point>> get_indices();
 
-        virtual void fft(cv::Mat const &rgba, cv::Mat &gray_spectrum);
-
-        std::vector<double> band_energy(cv::Mat const& spectrum, 
-                                        std::vector<cv::Mat> const& ring_masks);
-
-        const cv::Mat generate_ring_mask(const int n, std::string const& frequency_band);
+        /** 
+         * \brief Performs the Discrete Fourier Transform on the given image.
+         *
+         * \param image             The RGB image to be transformed.
+         * \param gray_spectrum     A reference to a cv::Mat object which will
+         *                          receive the Fourier spectrum of the image.
+         */
+        virtual void fft(cv::Mat const &image, cv::Mat &gray_spectrum);
 
         void generate_radial_vectors(const int n);
 
@@ -62,16 +115,6 @@ class FourierSharpnessBase {
 
         std::vector<double> process_radial_vectors(std::vector<cv::Mat> &masked_spectra);
         
-        const std::vector<cv::Mat> assemble_ring_mask_vector(const int n);
-
-        const std::vector<cv::Mat> assemble_single_ones_ring_mask(const int m, const int n);
-        
-        cv::Mat squarify(cv::Mat img, const double val);
-
-        void write_mat_to_file(cv::Mat& m, std::string const &filename);
-
-        std::vector<double> get_fft_coeff_vector(cv::Mat const &spectrum);
-
         std::vector<double> compute_descriptor(cv::Mat const &spectrum);
 
     private:

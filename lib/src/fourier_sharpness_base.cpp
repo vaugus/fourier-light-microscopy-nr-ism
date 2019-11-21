@@ -2,7 +2,6 @@
 #include "../include/fourier_sharpness_base.hpp"
 #include "../include/fft_utils.hpp"
 #include "../include/csv.hpp"
-#include "../include/matrix_operations.hpp"
 #include "../include/constants.hpp"
 
 /**
@@ -92,14 +91,14 @@ void FourierSharpnessBase::initialize_constants(int const step, int const limit)
  *
  * @return          The padded image.
  */
-void FourierSharpnessBase::fft(cv::Mat const &rgba, cv::Mat &gray_spectrum) {
+void FourierSharpnessBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     FFTUtils *fft_utils = new FFTUtils();
     Helper *helper = new Helper();
 
     // convert to grayscale colourspaces
-    cv::Mat gray = helper->luminance(rgba);
+    cv::Mat gray = helper->luminance(image);
 
-    cv::Size size(rgba.cols / 2,  rgba.rows / 2);
+    cv::Size size(image.cols / 2,  image.rows / 2);
     cv::Mat tmp;
     cv::resize(gray, tmp, size);
 
@@ -116,85 +115,6 @@ void FourierSharpnessBase::fft(cv::Mat const &rgba, cv::Mat &gray_spectrum) {
     gray.release();
 
     delete fft_utils;
-}
-
-/**
- * Calculates the energy of each band for the spectrum.
- *
- * @param spectrum      The spectrum to have the band energies calculated.
- * @param ring_masks    The set of ring masks for each band..
- *
- * @return              A vector with the energy values for each band.
- */
-std::vector<double> FourierSharpnessBase::band_energy(cv::Mat const& spectrum, 
-                                       std::vector<cv::Mat> const& ring_masks) {
-    std::vector<double> energies;
-
-    MatrixOperations *mat_ops = new MatrixOperations();
-    FFTUtils *fft_utils = new FFTUtils();
-
-    const unsigned m = spectrum.rows;
-    const unsigned n = spectrum.cols;
-
-    double energy = 0;
-    cv::Mat tmp;
-    std::vector<std::vector<double>> fft_array;
-
-    for (auto const& mask : ring_masks) {
-        spectrum.copyTo(tmp, mask);
-
-        fft_array = fft_utils->fft2array(tmp);
-        energy = mat_ops->euclidean_norm(fft_array, m, n);
-
-        energies.push_back(energy);
-
-        tmp.release();
-        energy = 0;
-    }
-
-    delete fft_utils;
-    delete mat_ops;
-
-    return energies;
-}
-
-
-/**
- * Generates a ring mask corresponding to the frequency band chosen.
- *
- * @param x                 The number of rows of the mask.
- * @param y                 The number of columns of the mask.
- * @param frequency_band    The frequency band to generate the mask.
- *
- * @return                  A Mat mask object.
- */
-const cv::Mat FourierSharpnessBase::generate_ring_mask(const int n, std::string const& frequency_band) {
-    const unsigned xc = unsigned(n / 2);
-    const unsigned yc = unsigned(n / 2);
-
-    const unsigned bw = unsigned(n / 5);
-    const unsigned half_bw = unsigned(bw / 2);
-
-    // Create black empty images
-    cv::Mat mask = cv::Mat::zeros(n, n, CV_8UC1);
-
-    double radius = 0;
-
-    if (frequency_band.compare(Constants::FREQ_BAND_MID) == 0) {
-        radius = yc - (3 * half_bw);
-    }
-
-    if (frequency_band.compare(Constants::FREQ_BAND_HIGH) == 0) {
-        radius = yc - (2 * half_bw);
-    }
-
-    if (frequency_band.compare(Constants::FREQ_BAND_HIGHEST) == 0) {
-        radius = yc - (half_bw / 2);
-    }
-   
-    // Draw a circle 
-    cv::circle(mask, cv::Point(xc, yc), radius, cv::Scalar(255, 255, 255), half_bw);
-    return mask;
 }
 
 
@@ -300,93 +220,6 @@ std::vector<cv::Mat> FourierSharpnessBase::apply_radial_vector_masks(cv::Mat con
     }
 
     return masked_spectra;
-}
-
-
-/**
- * Assembles a vector with the ring masks for each band.
- *
- * @param m     The number of rows of the mask.     
- * @param n     The number of columns of the mask.
- *
- * @return      The vector of ring masks.
- */
-const std::vector<cv::Mat> FourierSharpnessBase::assemble_ring_mask_vector(const int n) {
-    std::vector<cv::Mat> ring_masks;
-    std::vector<std::string> frequencies = {Constants::FREQ_BAND_MID,
-                                            Constants::FREQ_BAND_HIGH,
-                                            Constants::FREQ_BAND_HIGHEST};
-
-    cv::Mat mask;
-    for (auto const& frequency : frequencies) {
-        mask = generate_ring_mask(n, frequency);
-        ring_masks.push_back(mask);
-        mask.release();
-    }
-
-    return ring_masks;
-}
-
-/**
- * Assembles a vector with one ring mask.
- *
- * @param m     The number of rows of the mask.     
- * @param n     The number of columns of the mask.
- *
- * @return      The vector of ring masks.
- */
-const std::vector<cv::Mat> FourierSharpnessBase::assemble_single_ones_ring_mask(
-                                                                    const int m,
-                                                                    const int n) {
-    cv::Mat ones = cv::Mat(m, n, CV_8UC1, cv::Scalar(255));
-    std::vector<cv::Mat> ring_masks = {ones};
-    return ring_masks;
-}
-
-
-/**
- * Pads the image with the specified value.
- *
- * @param img       The image to be transformed.
- * @param val       The padding value.
- *
- * @return          The padded image.
- */
-cv::Mat FourierSharpnessBase::squarify(cv::Mat img, const double val) {
-    const unsigned pad_size = cv::max(img.rows, img.cols);
-
-    cv::Mat padded;
-    cv::copyMakeBorder(img, padded, 0,
-                       pad_size - img.rows, 0,
-                       pad_size - img.cols, 
-                       cv::BORDER_CONSTANT, 
-                       cv::Scalar::all(0));
-    return padded;
-}        
-
-
-/**
- * Pads the image with the specified value.
- *
- * @param m            The image to be transformed.
- * @param filename     The padding value.
- */
-void FourierSharpnessBase::write_mat_to_file(cv::Mat& m, std::string const &filename) {
-    std::ofstream fout(filename);
-
-    if(fout) {
-
-        for(unsigned i = 0; i < m.rows; i++) {
-            for(unsigned j = 0; j < m.cols; j++) {
-                fout << m.at<double>(i, j) << "\t";
-            }
-            fout << std::endl;
-        }
-
-        fout.close();
-    } else {
-        std::cout << "The file is closed." << std::endl;
-    }
 }
 
 

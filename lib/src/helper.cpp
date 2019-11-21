@@ -88,33 +88,3 @@ cv::Mat Helper::luminance(cv::Mat const& img) {
     cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
     return gray;
 }
-
-
-/**
- * Performs a resizing procedure on a grayscale image,
- * considering the provided scale factor.
- *
- * @param img          The input image to be converted.
- * @param factor       The colour space of the output.
- * 
- * @return             The resized image.
-*/
-void Helper::resize_to_factor(cv::Mat const& gray, cv::Mat &output, const unsigned factor) {
-    cv::Size size(gray.cols / factor,  gray.rows / factor);
-    cv::resize(gray, output, size);
-}
-
-
-/**
- * Performs a Contrast Limited Adaptive Histogram Equalization
- * (aka CLAHE) procedure on an image.
- *
- * @param img           The input image to be equalised.
- * @param output        The empty output image.
- * 
- * @return              The equalised image.
-*/
-void Helper::perform_clahe(cv::Mat const& img, cv::Mat &output) {
-    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
-    clahe->apply(img, output);
-}

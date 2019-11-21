@@ -5,7 +5,7 @@ CFLAGS = -c $(OMP)
 OPENCV = -I  /usr/local/include/opencv4
 LIBS = -L $(shell ls /usr/local/lib/*libopencv*.so -1)
 
-OBJ = csv.o matrix_operations.o helper.o fft_utils.o fourier_sharpness_base.o fft.o
+OBJ = csv.o helper.o fft_utils.o fourier_sharpness_base.o fft.o
 
 INC = lib/include/
 SRC = lib/src/
@@ -35,10 +35,6 @@ fft_utils.o: $(INC)fft_utils.hpp $(SRC)fft_utils.cpp
 helper.o: $(INC)helper.hpp $(SRC)helper.cpp 
 	$(info Building helper.o)
 	@$(CC) $(INC)helper.hpp $(SRC)helper.cpp -w $(CFLAGS) $(OPENCV)
-
-matrix_operations.o: $(INC)matrix_operations.hpp $(SRC)matrix_operations.cpp 
-	$(info Building matrix_operations.o)
-	@$(CC) $(INC)matrix_operations.hpp $(SRC)matrix_operations.cpp  -w $(CFLAGS)
 
 csv.o: $(INC)csv.hpp $(SRC)csv.cpp 
 	$(info Building csv.o)

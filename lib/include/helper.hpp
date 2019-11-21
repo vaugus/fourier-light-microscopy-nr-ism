@@ -24,11 +24,6 @@ class Helper {
         cv::Mat as_image(cv::Mat const arr, bool normalize);
 
         cv::Mat luminance(cv::Mat const& img);
-
-        void resize_to_factor(cv::Mat const& gray, cv::Mat &tmp, const unsigned factor);
-
-        void perform_clahe(cv::Mat const& img, cv::Mat &output);
-
 };
 
 #endif
