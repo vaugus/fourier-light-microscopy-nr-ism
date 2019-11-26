@@ -1,15 +1,23 @@
+/**
+ * @file fourier_sharpness_base.cpp
+ *
+ * @brief Source file for the implementation of the
+ * FourierSharpnessBase class.
+ *
+ * Source file with the implementation of the 
+ * FourierSharpnessBase class for operations 
+ * concerning the blur analysis in the Fourier domain.
+ *
+ * @author Victor Augusto 
+ * @version 1.0
+ * @date 2019-11-21
+ */
+
 #include <omp.h>
 #include "../include/fourier_sharpness_base.hpp"
 #include "../include/fft_utils.hpp"
 #include "../include/csv.hpp"
 #include "../include/constants.hpp"
-
-/**
- * Implementation of the FourierSharpnessBase class.
- *
- * @author Victor Augusto
- * @version 1.0
- */
 
 /**
  * Default constructor.
@@ -24,7 +32,12 @@ FourierSharpnessBase::FourierSharpnessBase() {
 FourierSharpnessBase::~FourierSharpnessBase() {
 }
 
-
+/*******************************************************************
+ *******************************************************************
+ * Getter and Setter methods.
+ *******************************************************************
+ *******************************************************************
+ */
 void FourierSharpnessBase::set_smallest_vector_size(int smallest_vector_size) {
     this->smallest_vector_size = smallest_vector_size;
 }
@@ -60,7 +73,10 @@ std::vector<std::vector<cv::Point>> FourierSharpnessBase::get_indices() {
     return this->indices;
 }
 
-
+/**
+ * Computes all cos and sin values for each of the given angles within the given
+ * interval. Also sets the smallest vector size to "infinity". 
+ */ 
 void FourierSharpnessBase::initialize_constants(int const step, int const limit) {
     set_smallest_vector_size(INT_MAX);
 
@@ -82,14 +98,14 @@ void FourierSharpnessBase::initialize_constants(int const step, int const limit)
 
 
 /**
- * Pads the image with the specified value.
+ * Performs the Discrete Fourier Transform on the given image and
+ * stores the result in a Mat object. First, the image is converted
+ * to the grayscale colour space and resized to its half. A contrast
+ * limited histogram enhancement is done to correct low light images,
+ * then the DFT is computed.
  *
- * @param rgba            The image to be transformed.
- * @param gray_spectrum     The padding value.
- * @param hsv_spectrum      The padding value.
- * @param ring_masks        The padding value.
- *
- * @return          The padded image.
+ * @param image             The image to be transformed.
+ * @param gray_spectrum     A Mat object to store the DFT result.
  */
 void FourierSharpnessBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     FFTUtils *fft_utils = new FFTUtils();
@@ -117,7 +133,10 @@ void FourierSharpnessBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     delete fft_utils;
 }
 
-
+/**
+ * Crops each vector of radial vector locations to the smallest
+ * vector size.
+ */
 void FourierSharpnessBase::crop_indices() {
     std::vector<std::vector<cv::Point>> indices = get_indices();
     // crop all the indices until they have the 'lst' size
@@ -133,16 +152,8 @@ void FourierSharpnessBase::crop_indices() {
  * applies the mask and finds the indices of the 
  * nonzero elements. 
  *
- * @param masked_spectra    The FFT spectrum to be analysed.
- * @param indices           The FFT spectrum to be analysed.
- * @param spectrum          The FFT spectrum to be analysed.
- * @param lst               The FFT spectrum to be analysed.
- * @param xc                The FFT spectrum to be analysed.
- * @param yc                The FFT spectrum to be analysed.
- * @param n                 The FFT spectrum to be analysed.
- *
- * @return                  A vector representing the coefficient
- *                          cumulative sum array.
+ * @param n     The dimension of the square matrix, resultant from
+ *              the Fourier Transform.
  */
 void FourierSharpnessBase::generate_radial_vectors(const int n) {
     const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
@@ -208,7 +219,11 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
     crop_indices();
 }
 
-
+/**
+ * For every radial vector mask, computes the element-wise multiplication with the 
+ * given spectrum and inserts it into a vector, which will be turned into the 
+ * descriptor in the subsequent stages.  
+ */ 
 std::vector<cv::Mat> FourierSharpnessBase::apply_radial_vector_masks(cv::Mat const &spectrum) {
     std::vector<cv::Mat> masked_spectra;
     cv::Mat tmp_spectrum;
@@ -222,7 +237,11 @@ std::vector<cv::Mat> FourierSharpnessBase::apply_radial_vector_masks(cv::Mat con
     return masked_spectra;
 }
 
-
+/**
+ * Performs the element-wise sum of each masked spectrum in order to generate
+ * an one-dimensional vector, then divides every element by the count of all
+ * vectors. 
+ */ 
 std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
     std::vector<double> sum(get_smallest_vector_size());
 
@@ -247,11 +266,6 @@ std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv:
 /**
  * Retrieves the sum of each element of eight radii 
  * of a spectrum in the form of vector<double>.
- *
- * @param spectrum      The FFT spectrum to be analysed.
- *
- * @return              A vector representing the coefficient
- *                      cumulative sum array.
  */
 std::vector<double> FourierSharpnessBase::compute_descriptor(cv::Mat const &spectrum) {
     std::vector<cv::Mat> masked_spectra = apply_radial_vector_masks(spectrum);
