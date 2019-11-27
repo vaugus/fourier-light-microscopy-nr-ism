@@ -1,23 +1,23 @@
-#include "../include/helper.hpp"
-
 /**
- * Implementation of the Helper class.
+ * @file helper.cpp
  *
- * @author Victor Augusto
+ * @brief Source file for the implementation of the
+ * Helper class.
+ *
+ * Implementation of the Helper class, which covers
+ * methods of general use in any other class.
+ *
+ * @author Victor Augusto 
  * @version 1.0
+ * @date 2019-11-21
  */
 
+#include "../include/helper.hpp"
 
 /** 
-    * Opens each image of the dataset, stores it in a vector, retrieves
-    * the name of each file and stores it in a vector.
-    *
-    * @param img_vec   reference to the std::vector that will store
-    *                  all the input images
-    * @param path      the name of the input text file which contains
-    *                  strings for all the input images
-    * @since           1.0
-    */
+ * Opens each image of the dataset, stores it in a vector, retrieves
+ * the name of each file and stores it in a vector.
+ */
 void Helper::open_dataset(std::vector<cv::Mat> &img_vec, std::string const& path) {
     std::string line;
     std::ifstream file (path);
@@ -42,7 +42,11 @@ void Helper::open_dataset(std::vector<cv::Mat> &img_vec, std::string const& path
     file.close();
 }
 
-
+/** 
+ * Takes the image of the [0, 255] range, normalizes it 
+ * to the [0,1] interval and finally returns a float
+ * Mat object with the image data.
+ */
 cv::Mat Helper::as_array(cv::Mat &img) {
     cv::Mat arr;
 
@@ -55,14 +59,18 @@ cv::Mat Helper::as_array(cv::Mat &img) {
     return arr;
 }
 
-
-cv::Mat Helper::as_image(cv::Mat const arr, bool normalize) {
+/**
+ * Takes the array of floating point numbers (either float or
+ * double) performs a min-max normalization if the normalize parameter
+ * is true and then to the [0, 255] range. Finally, returns a Mat object
+ * with the array data.
+ */
+cv::Mat Helper::as_image(cv::Mat const array, bool normalize) {
     cv::Mat tmp;
     cv::Mat img;
 
-
     if (normalize) {
-        cv::normalize(arr, tmp, 0, 1, cv::NORM_MINMAX, CV_32F);
+        cv::normalize(array, tmp, 0, 1, cv::NORM_MINMAX, CV_32F);
     }
 
     // scale values to 8-bit unsigned integers
@@ -75,14 +83,12 @@ cv::Mat Helper::as_image(cv::Mat const arr, bool normalize) {
     return img;
 }
 
-
 /**
- * Converts a RGBA image to the grayscale colorspace.
+ * Converts a RGBA digital image to a grayscale image,
+ * using the luminance method.
  *
- * @param rgba          The input image to be converted.
- * 
- * @return              The converted image.
-*/
+ * L = 0.299R + 0.587G + 0.114B
+ */
 cv::Mat Helper::luminance(cv::Mat const& img) {
     cv::Mat gray;
     cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
