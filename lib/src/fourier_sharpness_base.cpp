@@ -32,46 +32,6 @@ FourierSharpnessBase::FourierSharpnessBase() {
 FourierSharpnessBase::~FourierSharpnessBase() {
 }
 
-/*******************************************************************
- *******************************************************************
- * Getter and Setter methods.
- *******************************************************************
- *******************************************************************
- */
-void FourierSharpnessBase::set_smallest_vector_size(int smallest_vector_size) {
-    this->smallest_vector_size = smallest_vector_size;
-}
-
-int FourierSharpnessBase::get_smallest_vector_size() {
-    return this->smallest_vector_size;
-}
-
-
-void FourierSharpnessBase::set_center(const unsigned xc, const unsigned yc) {
-    this->center = cv::Point(xc, yc);
-}
-
-cv::Point FourierSharpnessBase::get_center() {
-    return this->center;
-}
-
-void FourierSharpnessBase::set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks) {
-    this->radial_vector_masks = radial_vector_masks;
-}
-
-
-std::vector<cv::Mat> FourierSharpnessBase::get_radial_vector_masks() {
-    return this->radial_vector_masks;
-}
-
-void FourierSharpnessBase::set_indices(std::vector<std::vector<cv::Point>> &indices) {
-    this->indices = indices;
-}
-
-
-std::vector<std::vector<cv::Point>> FourierSharpnessBase::get_indices() {
-    return this->indices;
-}
 
 /**
  * Computes all cos and sin values for each of the given angles within the given
@@ -196,7 +156,7 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
         cv::findNonZero(tmp_mask, idx);
         for (int i = 0; i < idx.rows; i++) {
             const cv::Point* Mi = idx.ptr<cv::Point>(i);
-            for(int j = 0; j < idx.cols; j++) {
+            for (int j = 0; j < idx.cols; j++) {
                 tmp_white_points.emplace_back(Mi[j]);
             }
         }
@@ -271,4 +231,46 @@ std::vector<double> FourierSharpnessBase::compute_descriptor(cv::Mat const &spec
     std::vector<cv::Mat> masked_spectra = apply_radial_vector_masks(spectrum);
     std::vector<double> sum = process_radial_vectors(masked_spectra);
     return sum;
+}
+
+
+/*******************************************************************
+ *******************************************************************
+ * Getter and Setter methods.
+ *******************************************************************
+ *******************************************************************
+ */
+void FourierSharpnessBase::set_smallest_vector_size(int smallest_vector_size) {
+    this->smallest_vector_size = smallest_vector_size;
+}
+
+int FourierSharpnessBase::get_smallest_vector_size() {
+    return this->smallest_vector_size;
+}
+
+
+void FourierSharpnessBase::set_center(const unsigned xc, const unsigned yc) {
+    this->center = cv::Point(xc, yc);
+}
+
+cv::Point FourierSharpnessBase::get_center() {
+    return this->center;
+}
+
+void FourierSharpnessBase::set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks) {
+    this->radial_vector_masks = radial_vector_masks;
+}
+
+
+std::vector<cv::Mat> FourierSharpnessBase::get_radial_vector_masks() {
+    return this->radial_vector_masks;
+}
+
+void FourierSharpnessBase::set_indices(std::vector<std::vector<cv::Point>> &indices) {
+    this->indices = indices;
+}
+
+
+std::vector<std::vector<cv::Point>> FourierSharpnessBase::get_indices() {
+    return this->indices;
 }
