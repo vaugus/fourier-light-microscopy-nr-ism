@@ -2,10 +2,10 @@
  * @file fourier_sharpness_base.cpp
  *
  * @brief Source file for the implementation of the
- * FourierSharpnessBase class.
+ * SampleFunctionBase class.
  *
  * Source file with the implementation of the 
- * FourierSharpnessBase class for operations 
+ * SampleFunctionBase class for operations 
  * concerning the blur analysis in the Fourier domain.
  *
  * @author Victor Augusto 
@@ -14,22 +14,24 @@
  */
 
 #include <omp.h>
-#include "../include/fourier_sharpness_base.hpp"
+#include "../include/sample_function_base.hpp"
 #include "../include/fft_utils.hpp"
 #include "../include/csv.hpp"
 #include "../include/constants.hpp"
+#include <chrono>
+#include <unistd.h>
 
 /**
  * Default constructor.
  */
-FourierSharpnessBase::FourierSharpnessBase() {
+SampleFunctionBase::SampleFunctionBase() {
     this->initialize_constants(5, 110);
 }
 
 /**
  * Default destructor.
  */    
-FourierSharpnessBase::~FourierSharpnessBase() {
+SampleFunctionBase::~SampleFunctionBase() {
 }
 
 
@@ -37,7 +39,7 @@ FourierSharpnessBase::~FourierSharpnessBase() {
  * Computes all cos and sin values for each of the given angles within the given
  * interval. Also sets the smallest vector size to "infinity". 
  */ 
-void FourierSharpnessBase::initialize_constants(int const step, int const limit) {
+void SampleFunctionBase::initialize_constants(int const step, int const limit) {
     set_smallest_vector_size(INT_MAX);
 
     // set this->cosines with the sequence {0,5,10,...,110}
@@ -67,20 +69,24 @@ void FourierSharpnessBase::initialize_constants(int const step, int const limit)
  * @param image             The image to be transformed.
  * @param gray_spectrum     A Mat object to store the DFT result.
  */
-void FourierSharpnessBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
+void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     FFTUtils *fft_utils = new FFTUtils();
     Helper *helper = new Helper();
 
+
     // convert to grayscale colourspaces
     cv::Mat gray = helper->luminance(image);
+
 
     cv::Size size(image.cols / 2,  image.rows / 2);
     cv::Mat tmp;
     cv::resize(gray, tmp, size);
 
+
     cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
     cv::Mat dst;
     clahe->apply(tmp, dst);
+
 
     // perform the fft on the converted images
     gray_spectrum = fft_utils->fft2(dst);
@@ -97,7 +103,7 @@ void FourierSharpnessBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
  * Crops each vector of radial vector locations to the smallest
  * vector size.
  */
-void FourierSharpnessBase::crop_indices() {
+void SampleFunctionBase::crop_indices() {
     std::vector<std::vector<cv::Point>> indices = get_indices();
     // crop all the indices until they have the 'lst' size
     for (auto &elem: indices) {
@@ -115,8 +121,9 @@ void FourierSharpnessBase::crop_indices() {
  * @param n     The dimension of the square matrix, resultant from
  *              the Fourier Transform.
  */
-void FourierSharpnessBase::generate_radial_vectors(const int n) {
+void SampleFunctionBase::generate_radial_vectors(const int n) {
     const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
+    // const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
 
     const unsigned radius = unsigned(n / 2);
     
@@ -184,7 +191,8 @@ void FourierSharpnessBase::generate_radial_vectors(const int n) {
  * given spectrum and inserts it into a vector, which will be turned into the 
  * descriptor in the subsequent stages.  
  */ 
-std::vector<cv::Mat> FourierSharpnessBase::apply_radial_vector_masks(cv::Mat const &spectrum) {
+std::vector<cv::Mat> SampleFunctionBase::apply_radial_vector_masks(cv::Mat const &spectrum) {
+
     std::vector<cv::Mat> masked_spectra;
     cv::Mat tmp_spectrum;
 
@@ -202,8 +210,9 @@ std::vector<cv::Mat> FourierSharpnessBase::apply_radial_vector_masks(cv::Mat con
  * an one-dimensional vector, then divides every element by the count of all
  * vectors. 
  */ 
-std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
+std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
     std::vector<double> sum(get_smallest_vector_size());
+
 
     // obtain all the masked pixels and sum them
     for (auto const elem : get_indices()) {
@@ -213,11 +222,18 @@ std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv:
             }
         }
     }
+    // auto start = std::chrono::steady_clock::now();
     
     // divide all elements by the number of vectors taken
     const double k = get_indices().size();
     std::transform(sum.begin(), sum.end(), sum.begin(), 
         [k](double& c) { return c / k; });
+
+    // auto end = std::chrono::steady_clock::now();
+
+    // std::cout << "Elapsed time in seconds : " 
+    // << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.0
+    // << " sec" << std::endl; 
 
     return sum;
 } 
@@ -227,7 +243,7 @@ std::vector<double> FourierSharpnessBase::process_radial_vectors(std::vector<cv:
  * Retrieves the sum of each element of eight radii 
  * of a spectrum in the form of vector<double>.
  */
-std::vector<double> FourierSharpnessBase::compute_descriptor(cv::Mat const &spectrum) {
+std::vector<double> SampleFunctionBase::compute_sample_function(cv::Mat const &spectrum) {
     std::vector<cv::Mat> masked_spectra = apply_radial_vector_masks(spectrum);
     std::vector<double> sum = process_radial_vectors(masked_spectra);
     return sum;
@@ -240,37 +256,37 @@ std::vector<double> FourierSharpnessBase::compute_descriptor(cv::Mat const &spec
  *******************************************************************
  *******************************************************************
  */
-void FourierSharpnessBase::set_smallest_vector_size(int smallest_vector_size) {
+void SampleFunctionBase::set_smallest_vector_size(int smallest_vector_size) {
     this->smallest_vector_size = smallest_vector_size;
 }
 
-int FourierSharpnessBase::get_smallest_vector_size() {
+int SampleFunctionBase::get_smallest_vector_size() {
     return this->smallest_vector_size;
 }
 
 
-void FourierSharpnessBase::set_center(const unsigned xc, const unsigned yc) {
+void SampleFunctionBase::set_center(const unsigned xc, const unsigned yc) {
     this->center = cv::Point(xc, yc);
 }
 
-cv::Point FourierSharpnessBase::get_center() {
+cv::Point SampleFunctionBase::get_center() {
     return this->center;
 }
 
-void FourierSharpnessBase::set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks) {
+void SampleFunctionBase::set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks) {
     this->radial_vector_masks = radial_vector_masks;
 }
 
 
-std::vector<cv::Mat> FourierSharpnessBase::get_radial_vector_masks() {
+std::vector<cv::Mat> SampleFunctionBase::get_radial_vector_masks() {
     return this->radial_vector_masks;
 }
 
-void FourierSharpnessBase::set_indices(std::vector<std::vector<cv::Point>> &indices) {
+void SampleFunctionBase::set_indices(std::vector<std::vector<cv::Point>> &indices) {
     this->indices = indices;
 }
 
 
-std::vector<std::vector<cv::Point>> FourierSharpnessBase::get_indices() {
+std::vector<std::vector<cv::Point>> SampleFunctionBase::get_indices() {
     return this->indices;
 }

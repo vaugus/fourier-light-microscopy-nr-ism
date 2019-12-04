@@ -1,3 +1,8 @@
+#include <iostream>
+#include <string>
+#include <complex>
+#include <cmath>
+#include <iomanip>
 #include "../include/fft_utils.hpp"
 #include "../include/constants.hpp"
 
@@ -59,7 +64,7 @@ cv::Mat FFTUtils::fft_shift(cv::Mat const &spectrum) {
     q2.copyTo(q1);
     tmp.copyTo(q2);
 
-    /* Transform the matrix with double values into a
+    /** Transform the matrix with double values into a
      * viewable image form (double between values 0 and 1).
      */ 
     normalize(spectrum, spectrum, 0, 1, cv::NORM_MINMAX);

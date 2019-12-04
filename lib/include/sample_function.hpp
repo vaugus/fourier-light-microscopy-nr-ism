@@ -1,7 +1,19 @@
+/**
+ * @file fft.hpp
+ *
+ * @brief Header file for class.
+ *
+ * Header file with a class for n
+ *
+ * @author Victor Augusto 
+ * @version 1.0
+ * @date 2019-11-21
+ */
+
 #ifndef FFT_HPP
 #define FFT_HPP
 
-#include "fourier_sharpness_base.hpp"
+#include "sample_function_base.hpp"
 
 /**
  * Header file with a class for operations concerning 
@@ -10,7 +22,7 @@
  * @author Victor Augusto
  * @version 1.0
  */
-class FFT : public FourierSharpnessBase {
+class SampleFunction : public SampleFunctionBase {
 
     public:
 

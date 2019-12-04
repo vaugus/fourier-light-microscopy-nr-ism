@@ -1,7 +1,7 @@
 /**
  * @file fourier_sharpness_base.hpp
  *
- * @brief Header file for class FourierSharpnessBase.
+ * @brief Header file for class SampleFunctionBase.
  *
  * Header file with a class for operations concerning 
  * the blur analysis in the Fourier domain.
@@ -27,7 +27,7 @@
 
 
 /**
- * @class FourierSharpnessBase
+ * @class SampleFunctionBase
  *
  * @brief Organizes the Fourier IQA in methods
  *
@@ -38,15 +38,15 @@
  * @author Victor Augusto
  * @version 1.0
  */
-class FourierSharpnessBase {
+class SampleFunctionBase {
 
     public:
 
-        /** @brief Instantiates a new FourierSharpnessBase object. */
-        FourierSharpnessBase();
+        /** @brief Instantiates a new SampleFunctionBase object. */
+        SampleFunctionBase();
 
-        /** @brief Destroys a FourierSharpnessBase instance. */
-        ~FourierSharpnessBase();
+        /** @brief Destroys a SampleFunctionBase instance. */
+        ~SampleFunctionBase();
 
         /** @param smallest_vector_size     The smallest vector size to set.*/
         void set_smallest_vector_size(const int smallest_vector_size);
@@ -123,7 +123,7 @@ class FourierSharpnessBase {
          *
          * @return      The vector which represents the descriptor.
          */
-        std::vector<double> compute_descriptor(cv::Mat const &spectrum);
+        std::vector<double> compute_sample_function(cv::Mat const &spectrum);
 
     private:
 

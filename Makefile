@@ -5,7 +5,7 @@ CFLAGS = -c $(OMP)
 OPENCV = -I  /usr/local/include/opencv4
 LIBS = -L $(shell ls /usr/local/lib/*libopencv*.so -1)
 
-OBJ = csv.o helper.o fft_utils.o fourier_sharpness_base.o fft.o
+OBJ = csv.o helper.o fft_utils.o sample_function_base.o sample_function.o
 
 INC = lib/include/
 SRC = lib/src/
@@ -20,13 +20,13 @@ main: $(OBJ) $(MAIN)main.cpp
 	$(info Building main)
 	@$(CC) -o main $(OBJ) $(MAIN)main.cpp $(OMP) $(OPENCV) $(LIBS)
 
-fft.o: $(INC)fft.hpp $(SRC)fft.cpp 
-	$(info Building fft.o)
-	@$(CC) $(INC)fft.hpp $(SRC)fft.cpp -w $(CFLAGS) $(OPENCV)
+sample_function.o: $(INC)sample_function.hpp $(SRC)sample_function.cpp 
+	$(info Building sample_function.o)
+	@$(CC) $(INC)sample_function.hpp $(SRC)sample_function.cpp -w $(CFLAGS) $(OPENCV)
 
-fourier_sharpness_base.o: $(INC)fourier_sharpness_base.hpp $(SRC)fourier_sharpness_base.cpp 
-	$(info Building fourier_sharpness_base.o)
-	@$(CC) $(INC)fourier_sharpness_base.hpp $(SRC)fourier_sharpness_base.cpp -w $(CFLAGS)  $(OPENCV)
+sample_function_base.o: $(INC)sample_function_base.hpp $(SRC)sample_function_base.cpp 
+	$(info Building sample_function_base.o)
+	@$(CC) $(INC)sample_function_base.hpp $(SRC)sample_function_base.cpp -w $(CFLAGS)  $(OPENCV)
 
 fft_utils.o: $(INC)fft_utils.hpp $(SRC)fft_utils.cpp 
 	$(info Building fft_utils.o)

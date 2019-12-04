@@ -1,4 +1,4 @@
-#include "../lib/include/fft.hpp"
+#include "../lib/include/sample_function.hpp"
 #include "../lib/include/fft_utils.hpp"
 #include "../lib/include/helper.hpp"
 #include <iostream>
@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 
     helper->open_dataset(img_vec, path);
 
-    std::string save_path = "/home/victor/Documents/msc-image-database/callisia/gray/50/";
+    std::string save_path = "/home/victor/Documents/msc-image-database/tradescantia/gray/SteREO/200/";
 
     cv::Mat gray;
     unsigned i = 1;

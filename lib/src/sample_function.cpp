@@ -1,4 +1,4 @@
-#include "../include/fft.hpp"
+#include "../include/sample_function.hpp"
 #include "../include/fft_utils.hpp"
 #include "../include/csv.hpp"
 #include "../include/constants.hpp"
@@ -7,7 +7,7 @@
 using namespace std;
 
 /**
- * Implementation of the FFT class.
+ * Implementation of the SampleFunction class.
  *
  * @author Victor Augusto
  * @version 1.0
@@ -20,10 +20,10 @@ using namespace std;
  * @param img_vec      The image to suffer the analysis.
  * @param params    The image to suffer the analysis.
  */
-void FFT::run_batch_fft(std::vector<cv::Mat> &img_vec) {
+void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
     // Generate the radial vectors for all spectra
     const unsigned n = get_final_spectrum_size(img_vec[0]);
-    FourierSharpnessBase::generate_radial_vectors(n);
+    SampleFunctionBase::generate_radial_vectors(n);
 
     CSVWriter *writer = new CSVWriter();
     writer->set_delimiter(",");
@@ -35,10 +35,10 @@ void FFT::run_batch_fft(std::vector<cv::Mat> &img_vec) {
 
     for (auto const& rgba : img_vec) {
         // perform the fast fourier transform
-        FourierSharpnessBase::fft(rgba, gray_spectrum);
+        SampleFunctionBase::fft(rgba, gray_spectrum);
 
         // extract the coefficient vector
-        tmp = FourierSharpnessBase::compute_descriptor(gray_spectrum);
+        tmp = SampleFunctionBase::compute_sample_function(gray_spectrum);
 
         coefficients.emplace_back(tmp);
 
@@ -54,7 +54,7 @@ void FFT::run_batch_fft(std::vector<cv::Mat> &img_vec) {
 }
 
 
-void FFT::sort_energy_distances(std::vector<std::pair<int, double>> &arr) {
+void SampleFunction::sort_energy_distances(std::vector<std::pair<int, double>> &arr) {
 
     auto comparator = [&](std::pair<int, double> a, std::pair<int, double> b)-> bool {
         return a.second > b.second;
@@ -64,6 +64,6 @@ void FFT::sort_energy_distances(std::vector<std::pair<int, double>> &arr) {
     sort(arr.begin(), arr.end(), comparator);
 }
 
-unsigned FFT::get_final_spectrum_size(cv::Mat const &img) {
+unsigned SampleFunction::get_final_spectrum_size(cv::Mat const &img) {
     return std::max(img.rows, img.cols) / 2;
 }

@@ -4,11 +4,6 @@
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
-#include <iostream>
-#include <string>
-#include <complex>
-#include <cmath>
-#include <iomanip>
 
 /**
  * Header file with a class for operations with 
