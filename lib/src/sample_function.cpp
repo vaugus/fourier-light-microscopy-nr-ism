@@ -2,6 +2,7 @@
 #include "../include/fft_utils.hpp"
 #include "../include/csv.hpp"
 #include "../include/constants.hpp"
+#include "../include/statistical_analysis.hpp"
 #include <ctime>
 
 using namespace std;
@@ -25,6 +26,8 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
     const unsigned n = get_final_spectrum_size(img_vec[0]);
     SampleFunctionBase::generate_radial_vectors(n);
 
+    StatisticalAnalysis *analysis = new StatisticalAnalysis();
+
     CSVWriter *writer = new CSVWriter();
     writer->set_delimiter(",");
     writer->set_linecount(0);
@@ -45,6 +48,8 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
         gray_spectrum.release();
         tmp.clear();
     }
+
+    // analysis->compute_kurtosis_all_crop_sizes(coefficients);
 
     writer->set_filename("output/descriptor/dataset.csv");
     writer->write_fft_descriptor_dataset(coefficients);

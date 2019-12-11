@@ -18,8 +18,6 @@
 #include "../include/fft_utils.hpp"
 #include "../include/csv.hpp"
 #include "../include/constants.hpp"
-#include <chrono>
-#include <unistd.h>
 
 /**
  * Default constructor.
@@ -123,7 +121,6 @@ void SampleFunctionBase::crop_indices() {
  */
 void SampleFunctionBase::generate_radial_vectors(const int n) {
     const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
-    // const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
 
     const unsigned radius = unsigned(n / 2);
     
@@ -133,12 +130,12 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
 
     // Mat object to hold the indices of non-zero points
     // among the mask.
-    cv::Mat idx;
+    cv::Mat indices;
 
     // Mat object for finding the indices of the non-zero 
     // points among the mask.
-    cv::Mat tmp_mask;
-
+    cv::Mat tmp_mask;    
+    
     std::vector<cv::Point> tmp_white_points;
     std::vector<std::vector<cv::Point>> tmp_indices;
     std::vector<cv::Mat> tmp_radial_vector_masks;
@@ -160,17 +157,18 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
                  16);
 
         // get all the indices from the vector
-        cv::findNonZero(tmp_mask, idx);
-        for (int i = 0; i < idx.rows; i++) {
-            const cv::Point* Mi = idx.ptr<cv::Point>(i);
-            for (int j = 0; j < idx.cols; j++) {
-                tmp_white_points.emplace_back(Mi[j]);
+        for (int i = 0; i < tmp_mask.rows; i++) {
+            const unsigned char* elem = tmp_mask.ptr<unsigned char>(i);
+            for (int j = 0; j < tmp_mask.cols; j++) {
+                if (elem[j] != 0) {
+                    tmp_white_points.emplace_back(cv::Point(i, j));
+                }
             }
         }
 
         // get the smallest vector
-        if (idx.rows < get_smallest_vector_size()) {
-            set_smallest_vector_size(idx.rows);
+        if (tmp_white_points.size() < get_smallest_vector_size()) {
+            set_smallest_vector_size(tmp_white_points.size());
         }
 
         tmp_radial_vector_masks.emplace_back(tmp_mask);
@@ -178,7 +176,6 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
 
         tmp_white_points.clear();
         tmp_mask.release();
-        idx.release();
     }
 
     set_radial_vector_masks(tmp_radial_vector_masks);
@@ -192,14 +189,13 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
  * descriptor in the subsequent stages.  
  */ 
 std::vector<cv::Mat> SampleFunctionBase::apply_radial_vector_masks(cv::Mat const &spectrum) {
-
     std::vector<cv::Mat> masked_spectra;
-    cv::Mat tmp_spectrum;
+    cv::Mat tmp;
 
     for (auto const& mask : get_radial_vector_masks()) {
-        spectrum.copyTo(tmp_spectrum, mask);
-        masked_spectra.emplace_back(tmp_spectrum);
-        tmp_spectrum.release();
+        spectrum.copyTo(tmp, mask);
+        masked_spectra.emplace_back(tmp);
+        tmp.release();
     }
 
     return masked_spectra;
@@ -213,7 +209,6 @@ std::vector<cv::Mat> SampleFunctionBase::apply_radial_vector_masks(cv::Mat const
 std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
     std::vector<double> sum(get_smallest_vector_size());
 
-
     // obtain all the masked pixels and sum them
     for (auto const elem : get_indices()) {
         for (auto const& spectra : masked_spectra) {
@@ -222,18 +217,11 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
             }
         }
     }
-    // auto start = std::chrono::steady_clock::now();
     
     // divide all elements by the number of vectors taken
     const double k = get_indices().size();
     std::transform(sum.begin(), sum.end(), sum.begin(), 
         [k](double& c) { return c / k; });
-
-    // auto end = std::chrono::steady_clock::now();
-
-    // std::cout << "Elapsed time in seconds : " 
-    // << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.0
-    // << " sec" << std::endl; 
 
     return sum;
 } 

@@ -5,7 +5,7 @@ CFLAGS = -c $(OMP)
 OPENCV = -I  /usr/local/include/opencv4
 LIBS = -L $(shell ls /usr/local/lib/*libopencv*.so -1)
 
-OBJ = csv.o helper.o fft_utils.o sample_function_base.o sample_function.o
+OBJ = csv.o helper.o fft_utils.o sample_function_base.o statistical_analysis.o sample_function.o
 
 INC = lib/include/
 SRC = lib/src/
@@ -23,6 +23,10 @@ main: $(OBJ) $(MAIN)main.cpp
 sample_function.o: $(INC)sample_function.hpp $(SRC)sample_function.cpp 
 	$(info Building sample_function.o)
 	@$(CC) $(INC)sample_function.hpp $(SRC)sample_function.cpp -w $(CFLAGS) $(OPENCV)
+
+statistical_analysis.o: $(INC)statistical_analysis.hpp $(SRC)statistical_analysis.cpp 
+	$(info Building statistical_analysis.o)
+	@$(CC) $(INC)statistical_analysis.hpp $(SRC)statistical_analysis.cpp -w $(CFLAGS)
 
 sample_function_base.o: $(INC)sample_function_base.hpp $(SRC)sample_function_base.cpp 
 	$(info Building sample_function_base.o)
