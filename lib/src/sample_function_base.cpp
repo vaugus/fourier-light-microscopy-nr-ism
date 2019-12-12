@@ -71,20 +71,16 @@ void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     FFTUtils *fft_utils = new FFTUtils();
     Helper *helper = new Helper();
 
-
     // convert to grayscale colourspaces
     cv::Mat gray = helper->luminance(image);
-
 
     cv::Size size(image.cols / 2,  image.rows / 2);
     cv::Mat tmp;
     cv::resize(gray, tmp, size);
 
-
     cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
     cv::Mat dst;
     clahe->apply(tmp, dst);
-
 
     // perform the fft on the converted images
     gray_spectrum = fft_utils->fft2(dst);
@@ -103,6 +99,7 @@ void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
  */
 void SampleFunctionBase::crop_indices() {
     std::vector<std::vector<cv::Point>> indices = get_indices();
+
     // crop all the indices until they have the 'lst' size
     for (auto &elem: indices) {
         elem.resize(get_smallest_vector_size());
@@ -159,6 +156,7 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
         // get all the indices from the vector
         for (int i = 0; i < tmp_mask.rows; i++) {
             const unsigned char* elem = tmp_mask.ptr<unsigned char>(i);
+           
             for (int j = 0; j < tmp_mask.cols; j++) {
                 if (elem[j] != 0) {
                     tmp_white_points.emplace_back(cv::Point(i, j));
@@ -192,8 +190,11 @@ std::vector<cv::Mat> SampleFunctionBase::apply_radial_vector_masks(cv::Mat const
     std::vector<cv::Mat> masked_spectra;
     cv::Mat tmp;
 
-    for (auto const& mask : get_radial_vector_masks()) {
-        spectrum.copyTo(tmp, mask);
+    std::vector<cv::Mat> masks = get_radial_vector_masks();
+
+    std::vector<cv::Mat>::iterator it;
+    for (it = std::begin(masks); it != std::end(masks); ++it) {
+        spectrum.copyTo(tmp, *it);
         masked_spectra.emplace_back(tmp);
         tmp.release();
     }
@@ -209,12 +210,20 @@ std::vector<cv::Mat> SampleFunctionBase::apply_radial_vector_masks(cv::Mat const
 std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
     std::vector<double> sum(get_smallest_vector_size());
 
+    std::vector<cv::Mat>::iterator masked;
+    std::vector<cv::Point>::iterator index;
+    cv::Mat tmp;
+
     // obtain all the masked pixels and sum them
     for (auto const elem : get_indices()) {
-        for (auto const& spectra : masked_spectra) {
+        for (masked = std::begin(masked_spectra); masked != std::end(masked_spectra); ++masked) {
+            tmp = *masked;
+            
             for (unsigned i = 0; i < elem.size(); i++) {
-                sum[i] += spectra.at<double>(elem[i]);
+                sum[i] += tmp.at<double>(elem[i]);
             }
+            
+            tmp.release();
         }
     }
     

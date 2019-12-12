@@ -36,9 +36,10 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
     std::vector<std::vector<double>> coefficients;
     std::vector<double> tmp;
 
-    for (auto const& rgba : img_vec) {
+    std::vector<cv::Mat>::iterator it;
+    for (it = std::begin(img_vec); it != std::end(img_vec); ++it) {
         // perform the fast fourier transform
-        SampleFunctionBase::fft(rgba, gray_spectrum);
+        SampleFunctionBase::fft(*it, gray_spectrum);
 
         // extract the coefficient vector
         tmp = SampleFunctionBase::compute_sample_function(gray_spectrum);

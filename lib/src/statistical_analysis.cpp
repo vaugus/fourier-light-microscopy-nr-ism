@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
+#include <chrono>
+#include <unistd.h>
 
 /**
  * Implementation of the StatisticalAnalysis class.
@@ -21,6 +23,8 @@ using namespace std;
  * @param params    The image to suffer the analysis.
  */
 void StatisticalAnalysis::compute_kurtosis_all_crop_sizes(std::vector<std::vector<double>> const& dataset) {
+    using namespace std;
+
     std::vector<std::vector<double>> probabilities;
     std::vector<std::vector<double>> kurtosis_array;
 
@@ -37,14 +41,19 @@ void StatisticalAnalysis::compute_kurtosis_all_crop_sizes(std::vector<std::vecto
     }
 
 
-    // // Assemble all possible crop sizes onto a vector
-    // std::vector<unsigned> crop_sizes(probabilities[0].size());
-    // std::iota(crop_sizes.begin(), crop_sizes.end(), 0);
+    // Assemble all possible crop sizes onto a vector
+    std::vector<unsigned> crop_sizes(probabilities[0].size());
+    std::iota(crop_sizes.begin(), crop_sizes.end(), 0);
 
-    // for (auto size : crop_sizes) {
+    std::vector<unsigned>::iterator crop;
 
-    // }
+    for (crop = std::begin(crop_sizes); crop != std::end(crop_sizes); ++crop) {
+        for (auto prob : probabilities) {
+            cout << prob.size() << endl;
+        }
+    }
 
+    exit(0);
     // for crop in range(max_length):
     //     # apply the current crop size
     //     kurtosis_arr[crop] = list(map(lambda x: kurtosis(data[x, crop:]), iterable))
