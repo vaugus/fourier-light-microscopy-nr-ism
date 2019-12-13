@@ -211,7 +211,6 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
     std::vector<double> sum(get_smallest_vector_size());
 
     std::vector<cv::Mat>::iterator masked;
-    std::vector<cv::Point>::iterator index;
     cv::Mat tmp;
 
     // obtain all the masked pixels and sum them
@@ -226,6 +225,7 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
             tmp.release();
         }
     }
+
     
     // divide all elements by the number of vectors taken
     const double k = get_indices().size();

@@ -50,7 +50,7 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
         tmp.clear();
     }
 
-    // analysis->compute_kurtosis_all_crop_sizes(coefficients);
+    analysis->compute_kurtosis_all_crop_sizes(coefficients);
 
     writer->set_filename("output/descriptor/dataset.csv");
     writer->write_fft_descriptor_dataset(coefficients);

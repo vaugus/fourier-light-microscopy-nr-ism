@@ -25,6 +25,13 @@ class StatisticalAnalysis {
     public:
         void compute_kurtosis_all_crop_sizes(std::vector<std::vector<double>> const& dataset);
 
+    private:
+
+        double kurtosis(std::vector<double> data);
+        double moment(std::vector<double> data, const int r);
+        double mean(std::vector<double> const& data);
+
+
 };
 
 #endif
