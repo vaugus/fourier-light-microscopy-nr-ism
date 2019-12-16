@@ -50,7 +50,8 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
         tmp.clear();
     }
 
-    analysis->compute_kurtosis_all_crop_sizes(coefficients);
+    std::vector<std::vector<double>> arr = analysis->compute_kurtosis_all_crop_sizes(coefficients);
+    std::cout << analysis->find_maximum_range(arr) << std::endl;
 
     writer->set_filename("output/descriptor/dataset.csv");
     writer->write_fft_descriptor_dataset(coefficients);

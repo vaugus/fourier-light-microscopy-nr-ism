@@ -23,14 +23,16 @@
 class StatisticalAnalysis {
 
     public:
-        void compute_kurtosis_all_crop_sizes(std::vector<std::vector<double>> const& dataset);
+        std::vector<std::vector<double>> compute_kurtosis_all_crop_sizes(
+            std::vector<std::vector<double>> const& dataset);
+
+        unsigned find_maximum_range(std::vector<std::vector<double>> const& kurtosis_array);
 
     private:
 
         double kurtosis(std::vector<double> data);
         double moment(std::vector<double> data, const int r);
         double mean(std::vector<double> const& data);
-
 
 };
 

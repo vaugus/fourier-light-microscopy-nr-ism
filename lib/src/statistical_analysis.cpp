@@ -2,11 +2,12 @@
 #include <iostream>
 #include <cmath>
 #include <map>
+#include <omp.h>
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
-#include <chrono>
-#include <unistd.h>
+#include <cfloat>
+
 
 /**
  * Implementation of the StatisticalAnalysis class.
@@ -23,9 +24,7 @@ using namespace std;
  * @param img_vec      The image to suffer the analysis.
  * @param params    The image to suffer the analysis.
  */
-void StatisticalAnalysis::compute_kurtosis_all_crop_sizes(std::vector<std::vector<double>> const& dataset) {
-    using namespace std;
-
+std::vector<std::vector<double>> StatisticalAnalysis::compute_kurtosis_all_crop_sizes(std::vector<std::vector<double>> const& dataset) {
     std::vector<std::vector<double>> probabilities;
     std::vector<std::vector<double>> kurtosis_array;
 
@@ -41,30 +40,64 @@ void StatisticalAnalysis::compute_kurtosis_all_crop_sizes(std::vector<std::vecto
         });
     }
 
+    const unsigned crop_sizes = probabilities[0].size();
 
-    // Assemble all possible crop sizes onto a vector
-    std::vector<unsigned> crop_sizes(probabilities[0].size());
-    std::iota(crop_sizes.begin(), crop_sizes.end(), 0);
-
+    std::vector<double> tmp_probability;
+    std::vector<double> tmp_kurtosis;
     std::vector<unsigned>::iterator crop;
 
-    for (crop = std::begin(crop_sizes); crop != std::end(crop_sizes); ++crop) {
-        for (auto prob : probabilities) {
-            cout << kurtosis(prob) << endl;
+    for (unsigned crop = 0; crop < crop_sizes; crop++) {
+        for (auto prob: probabilities) {
+            tmp_probability = std::vector<double>(prob.begin() + crop, prob.end());
+            tmp_kurtosis.emplace_back(kurtosis(tmp_probability));
+        }
+
+        kurtosis_array.emplace_back(tmp_kurtosis);
+        tmp_kurtosis.clear();
+    }
+
+    return kurtosis_array;
+}
+
+unsigned StatisticalAnalysis::find_maximum_range(std::vector<std::vector<double>> const& kurtosis_array) {
+    unsigned ans = 0;
+    double maximum = DBL_MIN;
+
+    const unsigned size = kurtosis_array.size();
+
+    std::vector<double> row;
+    double max = 0;
+    double min = 0;
+    double ptp = 0;
+
+    for (unsigned crop = 0; crop < size; crop++) {
+        row = kurtosis_array.at(crop);
+
+        max = *std::max_element(row.begin(), row.end());
+        min = *std::min_element(row.begin(), row.end());
+
+        // if the kurtosis resulted in negative values,
+        // the crop size is discarded
+        if ((max < 0) || (min < 0)) {
+            cout << crop << endl;
+            continue;
+        }
+
+        ptp = max - min;
+        // cout << std::setprecision(14) << ptp << endl;
+
+
+        if (ptp > maximum) {
+            maximum = ptp;
+            ans = crop;
         }
     }
 
-    exit(0);
-    // for crop in range(max_length):
-    //     # apply the current crop size
-    //     kurtosis_arr[crop] = list(map(lambda x: kurtosis(data[x, crop:]), iterable))
-        
-    // return data, kurtosis_arr, max_length, file_count
+    return ans;
 }
 
-
 double StatisticalAnalysis::kurtosis(std::vector<double> data) {
-    return moment(data, 4) / std::pow(moment(data, 2), 2);
+    return (moment(data, 4) / std::pow(moment(data, 2), 2)) - 3.0;
 }
 
 double StatisticalAnalysis::moment(std::vector<double> data, const int r) {
