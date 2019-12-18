@@ -115,27 +115,51 @@ double StatisticalAnalysis::iqr(std::vector<double> data) {
     // number of observations
     const unsigned n = data.size();
 
+    double ans = 0;
+
     // lambda expression to find the quartiles' positions
-    auto quartile = [](unsigned n, unsigned q) {
+    auto quar_position = [](unsigned n, unsigned q) {
         if (q == 1) {
             return (n + 3) / 4.0; 
         }
 
         if (q == 3) {
-            return (3 * n + 1) / 4.0; 
+            return (3.0 * n + 1) / 4.0; 
         }
-    }; 
+    };
 
-    // computation of the positions of each quartile - Q2 was ignored because 
-    // is not required for this IQR approach
-    double Q[2] = {quartile(n, 1), quartile(n, 3)};
-    
+    auto print = [] (double* arr) {
+        for (int i = 0; i < 3; i++) {
+            cout << arr[i] << endl;
+        }
+        cout << endl;
+    };
+
+    // computation of the positions of each quartile
+    double positions[3] = {quar_position(n, 1), median(data), quar_position(n, 3)};
+
+    print(positions);
+
     // retrieve upper indices to the left-closest positions to each quartile position
-    double upper[2] = {std::floor(Q[0]), std::floor(Q[1])};
-    double lower[2] = {upper[0] - 1, upper[1] - 1};
+    double indices[3];
+    for (unsigned i = 0; i < 3; i++) {
+        indices[i] = std::floor(positions[i]); 
+    }
 
-    const double Q1 = data[lower[0]] + 3.0 / 4.0 * (data[upper[0]] - data[lower[0]]);
-    const double Q3 = data[lower[1]] + 1.0 / 4.0 * (data[upper[1]] - data[lower[1]]);
+    print(indices);
+
+    // retrieve the difference between quartile positions and the floor-rounded indices
+    double differences[3] = {positions[0] - indices[0],
+                             positions[1] - indices[1],
+                             positions[2] - indices[2]};
+
+    print(differences);
+
+    const double Q1 = data[indices[0] - 1] + (data[indices[0]] - data[indices[0] - 1]) * differences[0];
+    const double Q3 = data[indices[2] - 1] + (data[indices[2]] - data[indices[2] - 1]) * differences[2];
+
+    cout << Q1 << endl;
+    cout << Q3 << endl;
 
     return Q3 - Q1;
 }
@@ -180,4 +204,38 @@ double StatisticalAnalysis::moment(std::vector<double> data, const int r) {
 
 double StatisticalAnalysis::mean(std::vector<double> const& data) {
     return std::accumulate(data.begin(), data.end(), 0.0) / data.size();
+}
+
+
+double StatisticalAnalysis::_mul(double* a, double* b) {
+    const unsigned n = sizeof(a) / sizeof(double);
+    double ans = 0.0;
+
+    for (int i = 0; i < n; i++) {
+        ans += a[i] * b[i];
+    }
+
+    return ans;
+}
+
+double* StatisticalAnalysis::_sum(double* a, double* b) {
+    const unsigned n = sizeof(a) / sizeof(double);
+    double ans[n] = {0};
+
+    for (int i = 0; i < n; i++) {
+        ans[i] = a[i] + b[i];
+    }
+
+    return ans;
+}
+
+double* StatisticalAnalysis::_sub(double* a, double* b) {
+    const unsigned n = sizeof(a) / sizeof(double);
+    double ans[n] = {0};
+
+    for (int i = 0; i < n; i++) {
+        ans[i] = a[i] - b[i];
+    }
+
+    return ans;
 }

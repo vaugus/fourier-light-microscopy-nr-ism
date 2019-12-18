@@ -41,6 +41,9 @@ class StatisticalAnalysis {
         double moment(std::vector<double> data, const int r);
         double mean(std::vector<double> const& data);
 
+        double _mul(double* a, double* b);
+        double* _sum(double* a, double* b);
+        double* _sub(double* a, double* b);
 };
 
 #endif

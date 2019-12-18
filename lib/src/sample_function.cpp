@@ -23,44 +23,39 @@ using namespace std;
  */
 void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
     // Generate the radial vectors for all spectra
-    // const unsigned n = get_final_spectrum_size(img_vec[0]);
-    // SampleFunctionBase::generate_radial_vectors(n);
+    const unsigned n = get_final_spectrum_size(img_vec[0]);
+    SampleFunctionBase::generate_radial_vectors(n);
 
-    StatisticalAnalysis *analysis = new StatisticalAnalysis();
-    //                         // 0  1  2  3  4  5  6  7
-    // std::vector<double> arr = {1, 2, 3, 4, 5, 6, 7, 8};
-    // cout << analysis->iqr(arr) << endl;
+    CSVWriter *writer = new CSVWriter();
+    writer->set_delimiter(",");
+    writer->set_linecount(0);
 
-    // CSVWriter *writer = new CSVWriter();
-    // writer->set_delimiter(",");
-    // writer->set_linecount(0);
+    cv::Mat gray_spectrum;
+    std::vector<std::vector<double>> coefficients;
+    std::vector<double> tmp;
 
-    // cv::Mat gray_spectrum;
-    // std::vector<std::vector<double>> coefficients;
-    // std::vector<double> tmp;
+    std::vector<cv::Mat>::iterator it;
+    for (it = std::begin(img_vec); it != std::end(img_vec); ++it) {
+        // perform the fast fourier transform
+        SampleFunctionBase::fft(*it, gray_spectrum);
 
-    // std::vector<cv::Mat>::iterator it;
-    // for (it = std::begin(img_vec); it != std::end(img_vec); ++it) {
-    //     // perform the fast fourier transform
-    //     SampleFunctionBase::fft(*it, gray_spectrum);
+        // extract the coefficient vector
+        tmp = SampleFunctionBase::compute_sample_function(gray_spectrum);
 
-    //     // extract the coefficient vector
-    //     tmp = SampleFunctionBase::compute_sample_function(gray_spectrum);
+        coefficients.emplace_back(tmp);
 
-    //     coefficients.emplace_back(tmp);
+        gray_spectrum.release();
+        tmp.clear();
+    }
 
-    //     gray_spectrum.release();
-    //     tmp.clear();
-    // }
-
-    // std::vector<std::vector<double>> arr = analysis->compute_kurtosis_all_crop_sizes(coefficients);
-    // std::cout << analysis->find_maximum_range(arr) << std::endl;
+    std::vector<std::vector<double>> arr = analysis->compute_kurtosis_all_crop_sizes(coefficients);
+    std::cout << analysis->find_maximum_range(arr) << std::endl;
     
-    // writer->set_filename("output/descriptor/dataset.csv");
-    // writer->write_fft_descriptor_dataset(coefficients);
+    writer->set_filename("output/descriptor/dataset.csv");
+    writer->write_fft_descriptor_dataset(coefficients);
 
-    // img_vec.clear();
-    // delete writer;
+    img_vec.clear();
+    delete writer;
 }
 
 
