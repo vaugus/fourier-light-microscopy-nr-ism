@@ -215,7 +215,7 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
 
     // obtain all the masked pixels and sum them
     for (auto const elem : get_indices()) {
-        for (masked = std::begin(masked_spectra); masked != std::end(masked_spectra); ++masked) {
+        for (masked = masked_spectra.begin(); masked != masked_spectra.end(); ++masked) {
             tmp = *masked;
             
             for (unsigned i = 0; i < elem.size(); i++) {
@@ -226,7 +226,6 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
         }
     }
 
-    
     // divide all elements by the number of vectors taken
     const double k = get_indices().size();
     std::transform(sum.begin(), sum.end(), sum.begin(), 

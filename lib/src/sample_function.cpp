@@ -26,6 +26,8 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
     const unsigned n = get_final_spectrum_size(img_vec[0]);
     SampleFunctionBase::generate_radial_vectors(n);
 
+    StatisticalAnalysis *analysis = new StatisticalAnalysis();
+
     CSVWriter *writer = new CSVWriter();
     writer->set_delimiter(",");
     writer->set_linecount(0);
@@ -48,11 +50,17 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
         tmp.clear();
     }
 
-    std::vector<std::vector<double>> arr = analysis->compute_kurtosis_all_crop_sizes(coefficients);
-    std::cout << analysis->find_maximum_range(arr) << std::endl;
+    std::vector<std::vector<double>> data;
+    std::vector<std::vector<double>> kurtosis_array;
+
+    analysis->compute_kurtosis_all_crop_sizes(coefficients, data, kurtosis_array);
     
-    writer->set_filename("output/descriptor/dataset.csv");
-    writer->write_fft_descriptor_dataset(coefficients);
+    const unsigned crop = analysis->find_maximum_range(kurtosis_array);
+    
+    analysis->compute_dataset_iqr(data, crop);
+    
+    // writer->set_filename("output/descriptor/dataset.csv");
+    // writer->write_fft_descriptor_dataset(coefficients);
 
     img_vec.clear();
     delete writer;
