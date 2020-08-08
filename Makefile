@@ -2,7 +2,7 @@ CC = g++ -std=c++17
 OMP = -fopenmp
 CFLAGS = -c $(OMP)
 
-OPENCV = -I  /usr/local/include/opencv4
+OPENCV = -I  /usr/local/include/opencv4/opencv2
 LIBS = -L $(shell ls /usr/local/lib/*libopencv*.so -1)
 
 OBJ = csv.o helper.o fft_utils.o sample_function_base.o statistical_analysis.o sample_function.o
