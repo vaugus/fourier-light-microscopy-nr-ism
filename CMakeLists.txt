@@ -28,6 +28,7 @@ set(SOURCES
     src/main.cpp
     lib/src/csv.cpp
     lib/src/helper.cpp
+    lib/src/image_util.cpp
     lib/src/fft_utils.cpp
     lib/src/sample_function_base.cpp
     lib/src/statistical_analysis.cpp

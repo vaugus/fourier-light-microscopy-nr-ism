@@ -1,6 +1,7 @@
 #include "../lib/include/sample_function.hpp"
 #include "../lib/include/fft_utils.hpp"
 #include "../lib/include/helper.hpp"
+#include "../lib/include/image_util.hpp"
 #include <memory>
 #include <iostream>
 
@@ -12,13 +13,12 @@ int main(int argc, char **argv) {
     }
     
     try {
-        std::vector<cv::Mat> img_vec;
         std::string const path = argv[1];
-
+        
         std::unique_ptr<SampleFunction> sample_processor = std::make_unique<SampleFunction>();
-        std::unique_ptr<Helper> helper_processor = std::make_unique<Helper>();
+        
+        std::vector<cv::Mat> img_vec = imageutil::load_dataset(path);
 
-        helper_processor->open_dataset(img_vec, path);
         sample_processor->run_batch_fft(img_vec);
         img_vec.clear();
     } catch (const std::exception& e) {
