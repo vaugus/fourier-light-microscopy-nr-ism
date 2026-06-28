@@ -1,4 +1,10 @@
-#include "../include/image_util.hpp"
+#include "ftiqa/image_util.hpp"
+
+#include <fstream>
+#include <stdexcept>
+
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 
 namespace imageutil
 {

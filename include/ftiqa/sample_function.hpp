@@ -13,7 +13,9 @@
 #ifndef FFT_HPP
 #define FFT_HPP
 
-#include "sample_function_base.hpp"
+#include <utility>
+
+#include "ftiqa/sample_function_base.hpp"
 
 /**
  * Header file with a class for operations concerning 

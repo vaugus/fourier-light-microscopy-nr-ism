@@ -1,9 +1,8 @@
-#include "../lib/include/sample_function.hpp"
-#include "../lib/include/fft_utils.hpp"
-#include "../lib/include/helper.hpp"
-#include "../lib/include/image_util.hpp"
-#include <memory>
 #include <iostream>
+#include <memory>
+
+#include "ftiqa/image_util.hpp"
+#include "ftiqa/sample_function.hpp"
 
 int main(int argc, char **argv) {
     if (argc != 3)

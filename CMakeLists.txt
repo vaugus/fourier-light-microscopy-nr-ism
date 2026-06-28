@@ -1,55 +1,39 @@
 cmake_minimum_required(VERSION 3.10)
-project(MyProject LANGUAGES CXX)
+project(ftiqa LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# -------------------------
-# OpenMP
-# -------------------------
+find_package(OpenCV REQUIRED)
 find_package(OpenMP REQUIRED)
 
-# -------------------------
-# OpenCV
-# -------------------------
-find_package(OpenCV REQUIRED)
-
-# -------------------------
-# Include directories
-# -------------------------
-include_directories(
-    lib/include
+add_library(ftiqa
+    src/ftiqa/csv.cpp
+    src/ftiqa/fft_utils.cpp
+    src/ftiqa/helper.cpp
+    src/ftiqa/image_util.cpp
+    src/ftiqa/sample_function.cpp
+    src/ftiqa/sample_function_base.cpp
+    src/ftiqa/statistical_analysis.cpp
 )
 
-# -------------------------
-# Source files
-# -------------------------
-set(SOURCES
-    src/main.cpp
-    lib/src/csv.cpp
-    lib/src/helper.cpp
-    lib/src/image_util.cpp
-    lib/src/fft_utils.cpp
-    lib/src/sample_function_base.cpp
-    lib/src/statistical_analysis.cpp
-    lib/src/sample_function.cpp
+target_compile_features(ftiqa PUBLIC cxx_std_17)
+
+target_include_directories(ftiqa
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${OpenCV_INCLUDE_DIRS}
 )
 
-# -------------------------
-# Executable
-# -------------------------
-add_executable(main ${SOURCES})
-
-# -------------------------
-# Link libraries
-# -------------------------
-target_link_libraries(main
+target_link_libraries(ftiqa
+    PUBLIC
+        ${OpenCV_LIBS}
     PRIVATE
         OpenMP::OpenMP_CXX
-        ${OpenCV_LIBS}
 )
 
-# -------------------------
-# Compiler flags (optional extra tuning)
-# -------------------------
-target_compile_options(main PRIVATE -Wall)
+target_compile_options(ftiqa PRIVATE -Wall)
+
+add_executable(main app/main.cpp)
+
+target_link_libraries(main
+    PRIVATE
+        ftiqa
+)

@@ -16,11 +16,9 @@
 #define CSV_HPP
 
 #include <fstream>
-#include <vector>
-#include <string>
 #include <iomanip>
-#include <iostream>
-#include <numeric>
+#include <string>
+#include <vector>
 
 class CSVWriter {
 
@@ -39,13 +37,7 @@ class CSVWriter {
          * @param first 	Pointer to the beginning of the range.
          * @param last		Pointer to the end of the range.     
          */
-        template <typename T> void add_data_in_row(T first, T last);
-
-        /**
-         * @brief Writes a column .csv file with the descriptor from a single image.
-         * 
-         * @param data      Vector with the data to be written.
-         */
+        /** @brief Writes a column .csv file with the descriptor from a single image. */
         void write_single_fft_coeff_csv(std::vector<double> const &data);
 
         /**
@@ -86,6 +78,14 @@ class CSVWriter {
         unsigned get_linecount();
 
 	private:
+        /**
+         * @brief Inserts the content of a vector into a csv row.
+         * 
+         * @tparam T        Data 
+         * @param first 	Pointer to the beginning of the range.
+         * @param last		Pointer to the end of the range.     
+         */
+        template <typename T> void add_data_in_row(T first, T last);
 
         /** Name of the file to be written. */
 		std::string filename;
@@ -96,5 +96,25 @@ class CSVWriter {
         /** Number of lines in the file. */
         unsigned linecount;
 };
+
+template <typename T>
+void CSVWriter::add_data_in_row(T first, T last) {
+	std::fstream file;
+
+	file.open(filename, std::ios::out | (linecount ? std::ios::app : std::ios::trunc));
+
+	for (; first != last; ) {
+        file << std::setprecision(20) << *first;
+
+		if (++first != last) {
+			file << std::setprecision(20) << delimiter;
+        }
+	}
+
+	file << "\n";
+	linecount++;
+
+	file.close();
+}
 
 #endif

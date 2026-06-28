@@ -1,8 +1,8 @@
-#include "../include/statistical_analysis.hpp"
+#include "ftiqa/statistical_analysis.hpp"
+
 #include <iostream>
 #include <cmath>
 #include <map>
-#include <omp.h>
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
@@ -114,8 +114,6 @@ double StatisticalAnalysis::iqr(std::vector<double> data) {
 
     std::sort(data.begin(), data.end());
 
-    double ans = 0;
-
     // lambda expression to find the quartiles' positions
     auto quar_position = [](unsigned n, unsigned q) {
         if (q == 1) {
@@ -125,6 +123,8 @@ double StatisticalAnalysis::iqr(std::vector<double> data) {
         if (q == 3) {
             return (3.0 * n + 1) / 4.0; 
         }
+
+        return 0.0;
     };
 
     // computation of the positions of each quartile

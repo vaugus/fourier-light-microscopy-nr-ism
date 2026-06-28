@@ -14,16 +14,9 @@
 #ifndef FOURIER_SHARPNESS_BASE_HPP
 #define FOURIER_SHARPNESS_BASE_HPP
 
-#include <map>
-#include <algorithm>
-#include <numeric>
 #include <vector>
-#include "opencv2/core.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
-#include <opencv2/photo.hpp>
-#include "../include/helper.hpp"
+
+#include <opencv2/core.hpp>
 
 
 /**
