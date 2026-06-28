@@ -1,9 +1,10 @@
-#include "../include/sample_function.hpp"
-#include "../include/fft_utils.hpp"
-#include "../include/csv.hpp"
-#include "../include/constants.hpp"
-#include "../include/statistical_analysis.hpp"
+#include "ftiqa/sample_function.hpp"
+
+#include <algorithm>
 #include <ctime>
+
+#include "ftiqa/csv.hpp"
+#include "ftiqa/statistical_analysis.hpp"
 
 using namespace std;
 

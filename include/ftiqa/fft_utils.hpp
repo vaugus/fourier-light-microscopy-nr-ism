@@ -1,9 +1,7 @@
 #ifndef FFT_UTILS_HPP
 #define FFT_UTILS_HPP
 
-#include "opencv4/opencv2/core.hpp"
-#include "opencv4/opencv2/imgproc.hpp"
-#include "opencv4/opencv2/highgui.hpp"
+#include <opencv2/core.hpp>
 
 /**
  * Header file with a class for operations with 

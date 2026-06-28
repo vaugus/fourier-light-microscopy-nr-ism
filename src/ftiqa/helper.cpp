@@ -12,7 +12,10 @@
  * @date 2019-11-21
  */
 
-#include "../include/helper.hpp"
+#include "ftiqa/helper.hpp"
+
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 
 /** 
  * Opens each image of the dataset, stores it in a vector, retrieves

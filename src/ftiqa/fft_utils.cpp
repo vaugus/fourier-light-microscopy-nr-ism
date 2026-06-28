@@ -3,8 +3,10 @@
 #include <complex>
 #include <cmath>
 #include <iomanip>
-#include "../include/fft_utils.hpp"
-#include "../include/constants.hpp"
+#include "ftiqa/fft_utils.hpp"
+#include "ftiqa/constants.hpp"
+
+#include <opencv2/imgproc.hpp>
 
 /**
  * Implementation of the FFTUtils class.
@@ -67,7 +69,7 @@ cv::Mat FFTUtils::fft_shift(cv::Mat const &spectrum) {
     /** Transform the matrix with double values into a
      * viewable image form (double between values 0 and 1).
      */ 
-    normalize(spectrum, spectrum, 0, 1, cv::NORM_MINMAX);
+    cv::normalize(spectrum, spectrum, 0, 1, cv::NORM_MINMAX);
     
     return spectrum;
 }

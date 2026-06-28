@@ -12,40 +12,14 @@
  * @date 2019-11-21
  */
 
-#include "../include/csv.hpp"
+#include "ftiqa/csv.hpp"
+
+#include <numeric>
 
 
 CSVWriter::CSVWriter() {}
 
 CSVWriter::~CSVWriter() {}
-
-/**
- * Accepts a range and appends all the elements in the range
- * to the last row, seperated by delimeter (default is comma).
- */
-template<typename T>
-void CSVWriter::add_data_in_row(T first, T last) {
-
-	std::fstream file;
-
-	// open the file in truncate mode if first line else in Append Mode
-	file.open(filename, std::ios::out | (linecount ? std::ios::app : std::ios::trunc));
-
-	// iterate over the range and add each element to file seperated by delimeter.
-	for (; first != last; ) {
-        file << std::setprecision(20) << *first;
-
-		if (++first != last) {
-			file << std::setprecision(20) << delimiter;
-        }
-	}
-
-	file << "\n";
-	linecount++;
-
-	// close the file
-	file.close();
-}
 
 /**
  * Accepts a range and appends all the elements in the range

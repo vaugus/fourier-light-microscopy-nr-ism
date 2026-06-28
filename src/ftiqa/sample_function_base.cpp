@@ -13,11 +13,16 @@
  * @date 2019-11-21
  */
 
-#include <omp.h>
-#include "../include/sample_function_base.hpp"
-#include "../include/fft_utils.hpp"
-#include "../include/csv.hpp"
-#include "../include/constants.hpp"
+#include "ftiqa/sample_function_base.hpp"
+
+#include <algorithm>
+#include <climits>
+#include <cmath>
+
+#include <opencv2/imgproc.hpp>
+#include <opencv2/photo.hpp>
+
+#include "ftiqa/fft_utils.hpp"
 
 /**
  * Default constructor.
@@ -69,10 +74,10 @@ void SampleFunctionBase::initialize_constants(int const step, int const limit) {
  */
 void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     FFTUtils *fft_utils = new FFTUtils();
-    Helper *helper = new Helper();
 
     // convert to grayscale colourspaces
-    cv::Mat gray = helper->luminance(image);
+    cv::Mat gray;
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
     cv::Size size(image.cols / 2,  image.rows / 2);
     cv::Mat tmp;
@@ -137,7 +142,7 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
     std::vector<std::vector<cv::Point>> tmp_indices;
     std::vector<cv::Mat> tmp_radial_vector_masks;
 
-    for (int i = 0; i < this->cosines.size(); i++) {
+    for (std::size_t i = 0; i < this->cosines.size(); i++) {
 
         // calculate the end point of the vector, based on the angle
         p2.x = (int)round(center.x + radius * this->cosines[i]);
@@ -165,7 +170,7 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
         }
 
         // get the smallest vector
-        if (tmp_white_points.size() < get_smallest_vector_size()) {
+        if (tmp_white_points.size() < static_cast<std::size_t>(get_smallest_vector_size())) {
             set_smallest_vector_size(tmp_white_points.size());
         }
 
@@ -214,7 +219,7 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
     cv::Mat tmp;
 
     // obtain all the masked pixels and sum them
-    for (auto const elem : get_indices()) {
+    for (auto const& elem : get_indices()) {
         for (masked = masked_spectra.begin(); masked != masked_spectra.end(); ++masked) {
             tmp = *masked;
             
