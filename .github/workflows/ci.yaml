@@ -3,7 +3,7 @@ name: CMake Build
 on:
   push:
     branches:
-      - '*'
+    - '*'
 
 jobs:
   build:
@@ -34,3 +34,6 @@ jobs:
 
       - name: Build
         run: cmake --build build --config Release
+
+      - name: Test
+        run: ./build/unit_tests
