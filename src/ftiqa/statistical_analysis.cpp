@@ -24,7 +24,7 @@ using namespace std;
  * @param img_vec      The image to suffer the analysis.
  * @param params    The image to suffer the analysis.
  */
-void StatisticalAnalysis::compute_kurtosis_all_crop_sizes(std::vector<std::vector<double>> const& dataset,
+void StatisticalAnalysis::computeKurtosisAllCropSizes(std::vector<std::vector<double>> const& dataset,
                                              std::vector<std::vector<double>> &probabilities,
                                              std::vector<std::vector<double>> &kurtosis_array) {
     
@@ -58,7 +58,7 @@ void StatisticalAnalysis::compute_kurtosis_all_crop_sizes(std::vector<std::vecto
 }
 
 
-unsigned StatisticalAnalysis::find_maximum_range(std::vector<std::vector<double>> const& kurtosis_array) {
+unsigned StatisticalAnalysis::findMaximumRange(std::vector<std::vector<double>> const& kurtosis_array) {
     unsigned ans = 0;
     double maximum = DBL_MIN;
 
@@ -93,7 +93,7 @@ unsigned StatisticalAnalysis::find_maximum_range(std::vector<std::vector<double>
 }
 
 
-std::vector<double> StatisticalAnalysis::compute_dataset_iqr(std::vector<std::vector<double>>
+std::vector<double> StatisticalAnalysis::computeDatasetIqr(std::vector<std::vector<double>>
 	const& data, const unsigned crop) {
 
 	std::vector<double> iqr_array;
@@ -115,7 +115,7 @@ double StatisticalAnalysis::iqr(std::vector<double> data) {
     std::sort(data.begin(), data.end());
 
     // lambda expression to find the quartiles' positions
-    auto quar_position = [](unsigned n, unsigned q) {
+    auto quarPosition = [](unsigned n, unsigned q) {
         if (q == 1) {
             return (n + 3) / 4.0; 
         }
@@ -128,7 +128,7 @@ double StatisticalAnalysis::iqr(std::vector<double> data) {
     };
 
     // computation of the positions of each quartile
-    double positions[2] = {quar_position(n, 1), quar_position(n, 3)};
+    double positions[2] = {quarPosition(n, 1), quarPosition(n, 3)};
 
     // retrieve upper indices to the left-closest positions to each quartile position
     double indices[2];

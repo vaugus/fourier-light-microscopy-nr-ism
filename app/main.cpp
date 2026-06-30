@@ -16,9 +16,9 @@ int main(int argc, char **argv) {
         
         std::unique_ptr<SampleFunction> sample_processor = std::make_unique<SampleFunction>();
         
-        std::vector<cv::Mat> img_vec = imageutil::load_dataset(path);
+        std::vector<cv::Mat> img_vec = imageutil::loadDataset(path);
 
-        sample_processor->run_batch_fft(img_vec);
+        sample_processor->runBatchFFT(img_vec);
         img_vec.clear();
     } catch (const std::exception& e) {
         std::cerr << "An exception occurred during execution: " << e.what() << std::endl;

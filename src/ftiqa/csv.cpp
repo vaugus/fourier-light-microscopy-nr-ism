@@ -25,16 +25,16 @@ CSVWriter::~CSVWriter() {}
  * Accepts a range and appends all the elements in the range
  * to the last row, seperated by delimeter (default is comma).
  */
-void CSVWriter::write_single_fft_coeff_csv(std::vector<double> const &data) {
+void CSVWriter::writeSingleFFTCoeffCsv(std::vector<double> const &data) {
 	// Adding header to CSV File
 	const std::vector<std::string> header = {"grayscale"};
-	add_data_in_row(header.begin(), header.end());
+	addDataInRow(header.begin(), header.end());
 
 	std::vector<double> tmp;
 	for (unsigned i = 0; i < data.size(); i++) {
 		tmp = {data[i]};
 
-		add_data_in_row(tmp.begin(), tmp.end());
+		addDataInRow(tmp.begin(), tmp.end());
 		tmp.clear();
 	}
 }
@@ -43,15 +43,15 @@ void CSVWriter::write_single_fft_coeff_csv(std::vector<double> const &data) {
  * Accepts a range and appends all the elements in the range
  * to the last row, seperated by delimeter (default is comma).
  */
-void CSVWriter::write_fft_descriptor_dataset(std::vector<std::vector<double>> const &data) {
+void CSVWriter::writeFFTDescriptorDataset(std::vector<std::vector<double>> const &data) {
 	// Adding header to CSV File
 	std::vector<int> header(data[0].size());
     std::iota(header.begin(), header.end(), 0);
 
-	add_data_in_row(header.begin(), header.end());
+	addDataInRow(header.begin(), header.end());
 
 	for (auto const& elem : data) {
-		add_data_in_row(elem.begin(), elem.end());
+		addDataInRow(elem.begin(), elem.end());
 	}
 }
 
@@ -62,26 +62,26 @@ void CSVWriter::write_fft_descriptor_dataset(std::vector<std::vector<double>> co
  *******************************************************************
  *******************************************************************
  */
-void CSVWriter::set_filename(std::string const& filename) {
+void CSVWriter::setFilename(std::string const& filename) {
 	this->filename = filename;
 }
 
-std::string CSVWriter::get_filename() {
+std::string CSVWriter::getFilename() {
 	return this->filename;
 }
 
-void CSVWriter::set_delimiter(std::string const& delimiter) {
+void CSVWriter::setDelimiter(std::string const& delimiter) {
 	this->delimiter = delimiter;
 }
 
-std::string CSVWriter::get_delimiter() {
+std::string CSVWriter::getDelimiter() {
 	return this->delimiter;
 }
 
-void CSVWriter::set_linecount(unsigned const& linecount) {
+void CSVWriter::setLineCount(unsigned const& linecount) {
 	this->linecount = linecount;
 }
 
-unsigned CSVWriter::get_linecount() {
+unsigned CSVWriter::getLineCount() {
 	return this->linecount;
 }

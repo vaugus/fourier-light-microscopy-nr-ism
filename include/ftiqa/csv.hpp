@@ -38,44 +38,44 @@ class CSVWriter {
          * @param last		Pointer to the end of the range.     
          */
         /** @brief Writes a column .csv file with the descriptor from a single image. */
-        void write_single_fft_coeff_csv(std::vector<double> const &data);
+        void writeSingleFFTCoeffCsv(std::vector<double> const &data);
 
         /**
          * @brief Writes a .csv file with the descriptors from a batch of images.
          * 
          * @param data      Vector with the data to be written.
          */
-        void write_fft_descriptor_dataset(std::vector<std::vector<double>> const &data);
+        void writeFFTDescriptorDataset(std::vector<std::vector<double>> const &data);
 
         /**
          * @param filename      Name of the file to be written.
          */
-        void set_filename(std::string const& filename);
+        void setFilename(std::string const& filename);
         
         /**
          * @return      A string with the filename.
          */
-        std::string get_filename();
+        std::string getFilename();
         
         /**
          * @param delimiter     String element as the delimiter of values.
          */
-        void set_delimiter(std::string const& delimiter);
+        void setDelimiter(std::string const& delimiter);
         
         /**
          * @return      The string which represents the delimiter.
          */
-        std::string get_delimiter();
+        std::string getDelimiter();
 
         /**
          * @param linecount     Number of lines of the file.
          */
-        void set_linecount(unsigned const& linecount);
+        void setLineCount(unsigned const& linecount);
         
         /**
          * @return      An integer with the number of lines of the file.
          */
-        unsigned get_linecount();
+        unsigned getLineCount();
 
 	private:
         /**
@@ -85,7 +85,7 @@ class CSVWriter {
          * @param first 	Pointer to the beginning of the range.
          * @param last		Pointer to the end of the range.     
          */
-        template <typename T> void add_data_in_row(T first, T last);
+        template <typename T> void addDataInRow(T first, T last);
 
         /** Name of the file to be written. */
 		std::string filename;
@@ -98,7 +98,7 @@ class CSVWriter {
 };
 
 template <typename T>
-void CSVWriter::add_data_in_row(T first, T last) {
+void CSVWriter::addDataInRow(T first, T last) {
 	std::fstream file;
 
 	file.open(filename, std::ios::out | (linecount ? std::ios::app : std::ios::trunc));

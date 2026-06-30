@@ -28,7 +28,7 @@
  * Default constructor.
  */
 SampleFunctionBase::SampleFunctionBase() {
-    this->initialize_constants(5, 110);
+    this->initializeConstants(5, 110);
 }
 
 /**
@@ -42,8 +42,8 @@ SampleFunctionBase::~SampleFunctionBase() {
  * Computes all cos and sin values for each of the given angles within the given
  * interval. Also sets the smallest vector size to "infinity". 
  */ 
-void SampleFunctionBase::initialize_constants(int const step, int const limit) {
-    set_smallest_vector_size(INT_MAX);
+void SampleFunctionBase::initializeConstants(int const step, int const limit) {
+    setSmallestVectorSize(INT_MAX);
 
     // set this->cosines with the sequence {0,5,10,...,110}
     for (int angle = 0; angle <= limit; angle += step) {
@@ -102,15 +102,15 @@ void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
  * Crops each vector of radial vector locations to the smallest
  * vector size.
  */
-void SampleFunctionBase::crop_indices() {
-    std::vector<std::vector<cv::Point>> indices = get_indices();
+void SampleFunctionBase::cropIndices() {
+    std::vector<std::vector<cv::Point>> indices = getIndices();
 
     // crop all the indices until they have the 'lst' size
     for (auto &elem: indices) {
-        elem.resize(get_smallest_vector_size());
+        elem.resize(getSmallestVectorSize());
     }
 
-    set_indices(indices);
+    setIndices(indices);
 }
 
 /**
@@ -121,12 +121,12 @@ void SampleFunctionBase::crop_indices() {
  * @param n     The dimension of the square matrix, resultant from
  *              the Fourier Transform.
  */
-void SampleFunctionBase::generate_radial_vectors(const int n) {
+void SampleFunctionBase::generateRadialVectors(const int n) {
     const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
 
     const unsigned radius = unsigned(n / 2);
     
-    set_center(radius, radius);
+    setCenter(radius, radius);
 
     cv::Point p2;
 
@@ -152,7 +152,7 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
         
         // draw the line 
         cv::line(tmp_mask,
-                 get_center(),
+                 getCenter(),
                  p2,
                  cv::Scalar(255, 255, 255),
                  1,
@@ -170,8 +170,8 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
         }
 
         // get the smallest vector
-        if (tmp_white_points.size() < static_cast<std::size_t>(get_smallest_vector_size())) {
-            set_smallest_vector_size(tmp_white_points.size());
+        if (tmp_white_points.size() < static_cast<std::size_t>(getSmallestVectorSize())) {
+            setSmallestVectorSize(tmp_white_points.size());
         }
 
         tmp_radial_vector_masks.emplace_back(tmp_mask);
@@ -181,9 +181,9 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
         tmp_mask.release();
     }
 
-    set_radial_vector_masks(tmp_radial_vector_masks);
-    set_indices(tmp_indices);
-    crop_indices();
+    setRadialVectorMasks(tmp_radial_vector_masks);
+    setIndices(tmp_indices);
+    cropIndices();
 }
 
 /**
@@ -191,11 +191,11 @@ void SampleFunctionBase::generate_radial_vectors(const int n) {
  * given spectrum and inserts it into a vector, which will be turned into the 
  * descriptor in the subsequent stages.  
  */ 
-std::vector<cv::Mat> SampleFunctionBase::apply_radial_vector_masks(cv::Mat const &spectrum) {
+std::vector<cv::Mat> SampleFunctionBase::applyRadialVectorMasks(cv::Mat const &spectrum) {
     std::vector<cv::Mat> masked_spectra;
     cv::Mat tmp;
 
-    std::vector<cv::Mat> masks = get_radial_vector_masks();
+    std::vector<cv::Mat> masks = getRadialVectorMasks();
 
     std::vector<cv::Mat>::iterator it;
     for (it = std::begin(masks); it != std::end(masks); ++it) {
@@ -212,14 +212,14 @@ std::vector<cv::Mat> SampleFunctionBase::apply_radial_vector_masks(cv::Mat const
  * an one-dimensional vector, then divides every element by the count of all
  * vectors. 
  */ 
-std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::Mat> &masked_spectra) {
-    std::vector<double> sum(get_smallest_vector_size());
+std::vector<double> SampleFunctionBase::processRadialVectors(std::vector<cv::Mat> &masked_spectra) {
+    std::vector<double> sum(getSmallestVectorSize());
 
     std::vector<cv::Mat>::iterator masked;
     cv::Mat tmp;
 
     // obtain all the masked pixels and sum them
-    for (auto const& elem : get_indices()) {
+    for (auto const& elem : getIndices()) {
         for (masked = masked_spectra.begin(); masked != masked_spectra.end(); ++masked) {
             tmp = *masked;
             
@@ -232,7 +232,7 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
     }
 
     // divide all elements by the number of vectors taken
-    const double k = get_indices().size();
+    const double k = getIndices().size();
     std::transform(sum.begin(), sum.end(), sum.begin(), 
         [k](double& c) { return c / k; });
 
@@ -244,9 +244,9 @@ std::vector<double> SampleFunctionBase::process_radial_vectors(std::vector<cv::M
  * Retrieves the sum of each element of eight radii 
  * of a spectrum in the form of vector<double>.
  */
-std::vector<double> SampleFunctionBase::compute_sample_function(cv::Mat const &spectrum) {
-    std::vector<cv::Mat> masked_spectra = apply_radial_vector_masks(spectrum);
-    std::vector<double> sum = process_radial_vectors(masked_spectra);
+std::vector<double> SampleFunctionBase::computeSampleFunction(cv::Mat const &spectrum) {
+    std::vector<cv::Mat> masked_spectra = applyRadialVectorMasks(spectrum);
+    std::vector<double> sum = processRadialVectors(masked_spectra);
     return sum;
 }
 
@@ -257,37 +257,37 @@ std::vector<double> SampleFunctionBase::compute_sample_function(cv::Mat const &s
  *******************************************************************
  *******************************************************************
  */
-void SampleFunctionBase::set_smallest_vector_size(int smallest_vector_size) {
+void SampleFunctionBase::setSmallestVectorSize(int smallest_vector_size) {
     this->smallest_vector_size = smallest_vector_size;
 }
 
-int SampleFunctionBase::get_smallest_vector_size() {
+int SampleFunctionBase::getSmallestVectorSize() {
     return this->smallest_vector_size;
 }
 
 
-void SampleFunctionBase::set_center(const unsigned xc, const unsigned yc) {
+void SampleFunctionBase::setCenter(const unsigned xc, const unsigned yc) {
     this->center = cv::Point(xc, yc);
 }
 
-cv::Point SampleFunctionBase::get_center() {
+cv::Point SampleFunctionBase::getCenter() {
     return this->center;
 }
 
-void SampleFunctionBase::set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks) {
+void SampleFunctionBase::setRadialVectorMasks(std::vector<cv::Mat> const& radial_vector_masks) {
     this->radial_vector_masks = radial_vector_masks;
 }
 
 
-std::vector<cv::Mat> SampleFunctionBase::get_radial_vector_masks() {
+std::vector<cv::Mat> SampleFunctionBase::getRadialVectorMasks() {
     return this->radial_vector_masks;
 }
 
-void SampleFunctionBase::set_indices(std::vector<std::vector<cv::Point>> &indices) {
+void SampleFunctionBase::setIndices(std::vector<std::vector<cv::Point>> &indices) {
     this->indices = indices;
 }
 
 
-std::vector<std::vector<cv::Point>> SampleFunctionBase::get_indices() {
+std::vector<std::vector<cv::Point>> SampleFunctionBase::getIndices() {
     return this->indices;
 }

@@ -56,7 +56,7 @@ static std::filesystem::path executable_path()
     return std::filesystem::path(buffer);
 }
 
-static void create_test_image_directory(const std::string &test_image_directory) 
+static void createTestImageDirectory(const std::string &test_image_directory) 
 {
     if (!std::filesystem::exists(test_image_directory))
     {
@@ -65,14 +65,14 @@ static void create_test_image_directory(const std::string &test_image_directory)
 }
 
 // Helper function to create simple test images
-static void create_test_image(const std::string &filename, cv::Scalar color)
+static void createTestImage(const std::string &filename, cv::Scalar color)
 {
     cv::Mat image(100, 100, CV_8UC3, color);
     cv::imwrite(filename, image);
 }
 
 // Helper function to create test dataset file
-static void create_test_dataset(const std::string &dataset_file, const std::vector<std::string> &image_paths)
+static void createTestDataset(const std::string &dataset_file, const std::vector<std::string> &image_paths)
 {
     std::ofstream file(dataset_file);
     for (const auto &path : image_paths)
@@ -177,17 +177,17 @@ TEST_F(ImageUtilTest, LoadDatasetMultipleImages) {
     std::string image2 = test_images_dir + "/image2.png";
     std::string image3 = test_images_dir + "/image3.png";
 
-    create_test_image_directory(test_images_dir);
+    createTestImageDirectory(test_images_dir);
 
-    create_test_image(image1, cv::Scalar(255, 0, 0));
-    create_test_image(image2, cv::Scalar(0, 255, 0));
-    create_test_image(image3, cv::Scalar(0, 0, 255));
+    createTestImage(image1, cv::Scalar(255, 0, 0));
+    createTestImage(image2, cv::Scalar(0, 255, 0));
+    createTestImage(image3, cv::Scalar(0, 0, 255));
 
     // Create dataset file
-    create_test_dataset(test_dataset_file, {image1, image2, image3});
+    createTestDataset(test_dataset_file, {image1, image2, image3});
 
     // Load dataset
-    std::vector<cv::Mat> images = load_dataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
 
     // Verify we loaded all images
     EXPECT_EQ(images.size(), 3u);
@@ -203,14 +203,14 @@ TEST_F(ImageUtilTest, LoadDatasetWithSingleImage) {
     test_images_dir = "/tmp/ftiqa_test_images3";
     test_dataset_file = "/tmp/ftiqa_test_images3.txt";
 
-    create_test_image_directory(test_images_dir);
+    createTestImageDirectory(test_images_dir);
 
     std::string single_image = test_images_dir + "/single.png";
-    create_test_image(single_image, cv::Scalar(128, 128, 128));
+    createTestImage(single_image, cv::Scalar(128, 128, 128));
 
-    create_test_dataset(test_dataset_file, {single_image});
+    createTestDataset(test_dataset_file, {single_image});
 
-    std::vector<cv::Mat> images = load_dataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
 
     EXPECT_EQ(images.size(), 1u);
     EXPECT_EQ(images[0].size(), cv::Size(100, 100));
@@ -222,7 +222,7 @@ TEST_F(ImageUtilTest, LoadDatasetWithEmptyFile) {
     std::ofstream file(test_dataset_file);
     // Don't write anything, leave empty
 
-    std::vector<cv::Mat> images = load_dataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
 
     // Empty file should load empty vector
     EXPECT_EQ(images.size(), 0u);
@@ -232,7 +232,7 @@ TEST_F(ImageUtilTest, LoadDatasetWithNonExistentFile) {
     // Test with non-existent file
     test_dataset_file = "/nonexistent/path/to/images.txt";
 
-    EXPECT_THROW(load_dataset(test_dataset_file), std::runtime_error);
+    EXPECT_THROW(loadDataset(test_dataset_file), std::runtime_error);
 }
 
 TEST_F(ImageUtilTest, LoadDatasetWithInvalidImagePath) {
@@ -240,20 +240,20 @@ TEST_F(ImageUtilTest, LoadDatasetWithInvalidImagePath) {
     test_images_dir = "/tmp/ftiqa_test_images4";
     test_dataset_file = "/tmp/ftiqa_test_images4.txt";
 
-    create_test_image_directory(test_images_dir);
+    createTestImageDirectory(test_images_dir);
 
     // Create only one image
     std::string valid_image = test_images_dir + "/valid.png";
-    create_test_image(valid_image, cv::Scalar(128, 128, 128));
+    createTestImage(valid_image, cv::Scalar(128, 128, 128));
 
     // Add invalid path
-    create_test_dataset(test_dataset_file, {valid_image, "/nonexistent/image.png"});
+    createTestDataset(test_dataset_file, {valid_image, "/nonexistent/image.png"});
 
     auto oldLevel = getLogLevel();
     setLogLevel(LOG_LEVEL_SILENT);
 
     // Should throw exception
-    EXPECT_THROW(load_dataset(test_dataset_file), std::runtime_error);
+    EXPECT_THROW(loadDataset(test_dataset_file), std::runtime_error);
 
     setLogLevel(oldLevel);
 }
@@ -264,8 +264,8 @@ TEST_F(ImageUtilTest, LoadDatasetWithEmptyLines) {
     test_dataset_file = "/tmp/ftiqa_test_images5.txt";
 
     std::string image1 = test_images_dir + "/image1.png";
-    create_test_image_directory(test_images_dir);
-    create_test_image(image1, cv::Scalar(128, 128, 128));
+    createTestImageDirectory(test_images_dir);
+    createTestImage(image1, cv::Scalar(128, 128, 128));
 
     std::ofstream file(test_dataset_file);
     file << image1 << "\n";
@@ -277,7 +277,7 @@ TEST_F(ImageUtilTest, LoadDatasetWithEmptyLines) {
     setLogLevel(LOG_LEVEL_SILENT);
     
     // Should throw exception
-    EXPECT_THROW(load_dataset(test_dataset_file), std::runtime_error);
+    EXPECT_THROW(loadDataset(test_dataset_file), std::runtime_error);
 
     setLogLevel(oldLevel);
 }
@@ -290,16 +290,16 @@ TEST_F(ImageUtilTest, LoadDatasetLargeDataset) {
     const size_t number_of_images = 5000;
     std::vector<std::string> image_paths;
 
-    create_test_image_directory(test_images_dir);
+    createTestImageDirectory(test_images_dir);
     for (size_t i = 0; i < number_of_images; ++i) {
         std::string image = test_images_dir + "/img_" + std::to_string(i) + ".png";
-        create_test_image(image, cv::Scalar(128 + i % 128, 128, 128));
+        createTestImage(image, cv::Scalar(128 + i % 128, 128, 128));
         image_paths.push_back(image);
     }
 
-    create_test_dataset(test_dataset_file, image_paths);
+    createTestDataset(test_dataset_file, image_paths);
 
-    std::vector<cv::Mat> images = load_dataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
 
     // Verify we loaded all images
     EXPECT_EQ(images.size(), number_of_images);
@@ -307,9 +307,9 @@ TEST_F(ImageUtilTest, LoadDatasetLargeDataset) {
 
 TEST_F(ImageUtilTest, LuminanceLargeImage) {
     // Test luminance with larger images
-    cv::Mat large_image(1000, 1000, CV_8UC3, cv::Scalar(200, 150, 100));
+    cv::Mat largeImage(1000, 1000, CV_8UC3, cv::Scalar(200, 150, 100));
 
-    cv::Mat result = luminance(large_image);
+    cv::Mat result = luminance(largeImage);
 
     EXPECT_EQ(result.size(), cv::Size(1000, 1000));
     EXPECT_EQ(result.channels(), 1);
@@ -331,9 +331,9 @@ TEST_F(ImageUtilTest, LuminanceNonSquareImage) {
 
 TEST_F(ImageUtilTest, LuminanceVerySmallImage) {
     // Test luminance with very small images
-    cv::Mat small_image(1, 1, CV_8UC3, cv::Scalar(100, 100, 100));
+    cv::Mat smallImage(1, 1, CV_8UC3, cv::Scalar(100, 100, 100));
 
-    cv::Mat result = luminance(small_image);
+    cv::Mat result = luminance(smallImage);
 
     EXPECT_EQ(result.rows, 1);
     EXPECT_EQ(result.cols, 1);
@@ -343,9 +343,9 @@ TEST_F(ImageUtilTest, LuminanceVerySmallImage) {
 
 TEST_F(ImageUtilTest, LuminanceVeryWideImage) {
     // Test luminance with very wide images
-    cv::Mat wide_image(1, 10000, CV_8UC3, cv::Scalar(50, 50, 50));
+    cv::Mat wideImage(1, 10000, CV_8UC3, cv::Scalar(50, 50, 50));
 
-    cv::Mat result = luminance(wide_image);
+    cv::Mat result = luminance(wideImage);
 
     EXPECT_EQ(result.rows, 1);
     EXPECT_EQ(result.cols, 10000);
@@ -353,9 +353,9 @@ TEST_F(ImageUtilTest, LuminanceVeryWideImage) {
 
 TEST_F(ImageUtilTest, LuminanceVeryTallImage) {
     // Test luminance with very tall images
-    cv::Mat tall_image(10000, 1, CV_8UC3, cv::Scalar(50, 50, 50));
+    cv::Mat tallImage(10000, 1, CV_8UC3, cv::Scalar(50, 50, 50));
 
-    cv::Mat result = luminance(tall_image);
+    cv::Mat result = luminance(tallImage);
 
     EXPECT_EQ(result.rows, 10000);
     EXPECT_EQ(result.cols, 1);

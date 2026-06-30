@@ -23,17 +23,17 @@
 class StatisticalAnalysis {
 
     public:
-        std::vector<double> compute_dataset_iqr(std::vector<std::vector<double>>
+        std::vector<double> computeDatasetIqr(std::vector<std::vector<double>>
             const& data,
             const unsigned crop);
 
         double median(std::vector<double> data);
     
-        void compute_kurtosis_all_crop_sizes(std::vector<std::vector<double>> const& dataset,
+        void computeKurtosisAllCropSizes(std::vector<std::vector<double>> const& dataset,
                                              std::vector<std::vector<double>> &probabilities,
                                              std::vector<std::vector<double>> &kurtosis_array);
 
-        unsigned find_maximum_range(std::vector<std::vector<double>> const& kurtosis_array);
+        unsigned findMaximumRange(std::vector<std::vector<double>> const& kurtosis_array);
 
     private:
 

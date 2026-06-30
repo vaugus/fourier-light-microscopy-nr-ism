@@ -41,7 +41,7 @@ class Helper {
          * @param img_vec   Vector where the images will be stored.
          * @param path      String with the path to the input file.
          */
-        void open_dataset(std::vector<cv::Mat> &img_vec, std::string const& path);
+        void openDataset(std::vector<cv::Mat> &img_vec, std::string const& path);
         
         /**
          * @brief Converts the digital image to an array of floats.
@@ -50,7 +50,7 @@ class Helper {
          *
          * @return      The converted image as a Mat object.
          */
-        cv::Mat as_array(cv::Mat &img);
+        cv::Mat asArray(cv::Mat &img);
 
         /**
          * @brief Converts an array of floats to a digital image.
@@ -61,7 +61,7 @@ class Helper {
          *
          * @return              The converted array as a Mat object.
          */
-        cv::Mat as_image(cv::Mat const array, bool normalize);
+        cv::Mat asImage(cv::Mat const array, bool normalize);
 
         /**
          * @brief Converts an image to the grayscale colour space.

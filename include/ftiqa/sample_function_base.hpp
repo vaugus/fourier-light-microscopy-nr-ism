@@ -42,46 +42,46 @@ class SampleFunctionBase {
         ~SampleFunctionBase();
 
         /** @param smallest_vector_size     The smallest vector size to set.*/
-        void set_smallest_vector_size(const int smallest_vector_size);
+        void setSmallestVectorSize(const int smallest_vector_size);
         
         /** @return current smallest vector size.*/
-        int get_smallest_vector_size();
+        int getSmallestVectorSize();
         
         /** 
          * @param xc    The x coordinate of the center point
          * @param yc    The y coordinate of the center point.
          */
-        void set_center(const unsigned xc, const unsigned yc);
+        void setCenter(const unsigned xc, const unsigned yc);
 
         /** 
          * @return     A cv::Point object that represents the center of
          *             the current image. 
          */
-        cv::Point get_center();
+        cv::Point getCenter();
 
         /** 
          * @param xc    The x coordinate of the center point
          * @param yc    The y coordinate of the center point.
          */
-        void set_radial_vector_masks(std::vector<cv::Mat> const& radial_vector_masks);
+        void setRadialVectorMasks(std::vector<cv::Mat> const& radial_vector_masks);
         
         /** 
          * @return      A std::vector of cv::Mat objects with the radial vector masks
          *              of the current dimensions.
          */
-        std::vector<cv::Mat> get_radial_vector_masks();
+        std::vector<cv::Mat> getRadialVectorMasks();
 
         /** 
          * @param indices   Two-dimensional std::vector of cv::Point with the indices
          *                  of white points in a radial vector mask.  
          */
-        void set_indices(std::vector<std::vector<cv::Point>> &indices);
+        void setIndices(std::vector<std::vector<cv::Point>> &indices);
 
         /** 
          * @return      A two-dimensional std::vector of cv::Point with the current 
          *              indices of white points. 
          */
-        std::vector<std::vector<cv::Point>> get_indices();
+        std::vector<std::vector<cv::Point>> getIndices();
 
         /** 
          * @brief Performs the Discrete Fourier Transform on the given image.
@@ -97,7 +97,7 @@ class SampleFunctionBase {
          *
          * @param n     The dimension of the square image.
          */
-        void generate_radial_vectors(const int n);
+        void generateRadialVectors(const int n);
 
         /** 
          * @brief Computes the mean of each element from the descriptor.
@@ -106,7 +106,7 @@ class SampleFunctionBase {
          *
          * @return      The vector which represents the descriptor.
          */
-        std::vector<double> process_radial_vectors(std::vector<cv::Mat> &masked_spectra);
+        std::vector<double> processRadialVectors(std::vector<cv::Mat> &masked_spectra);
 
 
         /** 
@@ -116,7 +116,7 @@ class SampleFunctionBase {
          *
          * @return      The vector which represents the descriptor.
          */
-        std::vector<double> compute_sample_function(cv::Mat const &spectrum);
+        std::vector<double> computeSampleFunction(cv::Mat const &spectrum);
 
     private:
 
@@ -145,7 +145,7 @@ class SampleFunctionBase {
          * @param step      The increment angles to compute sin and cos.
          * @param limit     The maximum angle.
          */
-        void initialize_constants(int const step, int const limit);
+        void initializeConstants(int const step, int const limit);
 
         /** 
          * @brief Multiplies element-wise each radial vector mask by 
@@ -155,12 +155,12 @@ class SampleFunctionBase {
          *
          * @return      The vector with the spectrum multiplied by each of the masks.
          */
-        std::vector<cv::Mat> apply_radial_vector_masks(cv::Mat const &spectrum);
+        std::vector<cv::Mat> applyRadialVectorMasks(cv::Mat const &spectrum);
 
         /** 
          * @brief Reduces the size of all indices to the smallest vector size.
          */
-        void crop_indices();
+        void cropIndices();
 };
 
 #endif
