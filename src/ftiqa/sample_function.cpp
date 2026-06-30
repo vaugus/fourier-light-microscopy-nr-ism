@@ -22,16 +22,16 @@ using namespace std;
  * @param img_vec      The image to suffer the analysis.
  * @param params    The image to suffer the analysis.
  */
-void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
+void SampleFunction::runBatchFFT(std::vector<cv::Mat> &img_vec) {
     // Generate the radial vectors for all spectra
-    const unsigned n = get_final_spectrum_size(img_vec[0]);
-    SampleFunctionBase::generate_radial_vectors(n);
+    const unsigned n = getFinalSpectrumSize(img_vec[0]);
+    SampleFunctionBase::generateRadialVectors(n);
 
     StatisticalAnalysis *analysis = new StatisticalAnalysis();
 
     CSVWriter *writer = new CSVWriter();
-    writer->set_delimiter(",");
-    writer->set_linecount(0);
+    writer->setDelimiter(",");
+    writer->setLineCount(0);
 
     cv::Mat gray_spectrum;
     std::vector<std::vector<double>> coefficients;
@@ -43,7 +43,7 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
         SampleFunctionBase::fft(*it, gray_spectrum);
 
         // extract the coefficient vector
-        tmp = SampleFunctionBase::compute_sample_function(gray_spectrum);
+        tmp = SampleFunctionBase::computeSampleFunction(gray_spectrum);
 
         coefficients.emplace_back(tmp);
 
@@ -54,21 +54,21 @@ void SampleFunction::run_batch_fft(std::vector<cv::Mat> &img_vec) {
     std::vector<std::vector<double>> data;
     std::vector<std::vector<double>> kurtosis_array;
 
-    analysis->compute_kurtosis_all_crop_sizes(coefficients, data, kurtosis_array);
+    analysis->computeKurtosisAllCropSizes(coefficients, data, kurtosis_array);
     
-    const unsigned crop = analysis->find_maximum_range(kurtosis_array);
+    const unsigned crop = analysis->findMaximumRange(kurtosis_array);
     
-    analysis->compute_dataset_iqr(data, crop);
+    analysis->computeDatasetIqr(data, crop);
     
-    // writer->set_filename("output/descriptor/dataset.csv");
-    // writer->write_fft_descriptor_dataset(coefficients);
+    // writer->setFilename("output/descriptor/dataset.csv");
+    // writer->writeFFTDescriptorDataset(coefficients);
 
     img_vec.clear();
     delete writer;
 }
 
 
-void SampleFunction::sort_energy_distances(std::vector<std::pair<int, double>> &arr) {
+void SampleFunction::sortEnergyDistances(std::vector<std::pair<int, double>> &arr) {
 
     auto comparator = [&](std::pair<int, double> a, std::pair<int, double> b)-> bool {
         return a.second > b.second;
@@ -78,6 +78,6 @@ void SampleFunction::sort_energy_distances(std::vector<std::pair<int, double>> &
     sort(arr.begin(), arr.end(), comparator);
 }
 
-unsigned SampleFunction::get_final_spectrum_size(cv::Mat const &img) {
+unsigned SampleFunction::getFinalSpectrumSize(cv::Mat const &img) {
     return std::max(img.rows, img.cols) / 2;
 }

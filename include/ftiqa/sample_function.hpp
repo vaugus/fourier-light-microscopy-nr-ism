@@ -28,12 +28,12 @@ class SampleFunction : public SampleFunctionBase {
 
     public:
 
-        void run_batch_fft(std::vector<cv::Mat> &img_vec);
-        void sort_energy_distances(std::vector<std::pair<int, double>> &arr);
+        void runBatchFFT(std::vector<cv::Mat> &img_vec);
+        void sortEnergyDistances(std::vector<std::pair<int, double>> &arr);
 
     private:
 
-        unsigned get_final_spectrum_size(cv::Mat const &img);
+        unsigned getFinalSpectrumSize(cv::Mat const &img);
 };
 
 #endif

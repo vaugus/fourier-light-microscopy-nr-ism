@@ -38,7 +38,7 @@ FFTUtils::~FFTUtils() {
  *
  * @return              The shifted spectrum.
  */
-cv::Mat FFTUtils::fft_shift(cv::Mat const &spectrum) {
+cv::Mat FFTUtils::fftShift(cv::Mat const &spectrum) {
     const unsigned cx = spectrum.cols / 2;
     const unsigned cy = spectrum.rows / 2;
 
@@ -129,6 +129,6 @@ cv::Mat FFTUtils::fft2(cv::Mat const &img) {
     complexI.release();
 
     // perform the shift of the smallest coefficient to the center
-    res = fft_shift(res);
+    res = fftShift(res);
     return res;
 }

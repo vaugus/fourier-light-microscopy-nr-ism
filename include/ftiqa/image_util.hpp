@@ -8,7 +8,7 @@
 
 namespace imageutil
 {
-    std::vector<cv::Mat> load_dataset(const std::filesystem::path &dataset_file);
+    std::vector<cv::Mat> loadDataset(const std::filesystem::path &dataset_file);
     cv::Mat luminance(const cv::Mat &image);
 }
 

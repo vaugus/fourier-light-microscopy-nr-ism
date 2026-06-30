@@ -17,7 +17,7 @@ class FFTUtils {
         FFTUtils();
         ~FFTUtils();
 
-        cv::Mat fft_shift(cv::Mat const &spectrum);
+        cv::Mat fftShift(cv::Mat const &spectrum);
         cv::Mat fft2(cv::Mat const &img);
 };
 

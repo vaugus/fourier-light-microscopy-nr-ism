@@ -21,7 +21,7 @@
  * Opens each image of the dataset, stores it in a vector, retrieves
  * the name of each file and stores it in a vector.
  */
-void Helper::open_dataset(std::vector<cv::Mat> &img_vec, std::string const& path) {
+void Helper::openDataset(std::vector<cv::Mat> &img_vec, std::string const& path) {
     std::string line;
     std::ifstream file (path);
 
@@ -50,7 +50,7 @@ void Helper::open_dataset(std::vector<cv::Mat> &img_vec, std::string const& path
  * to the [0,1] interval and finally returns a float
  * Mat object with the image data.
  */
-cv::Mat Helper::as_array(cv::Mat &img) {
+cv::Mat Helper::asArray(cv::Mat &img) {
     cv::Mat arr;
 
     // scale values to 32-bit floats
@@ -68,7 +68,7 @@ cv::Mat Helper::as_array(cv::Mat &img) {
  * is true and then to the [0, 255] range. Finally, returns a Mat object
  * with the array data.
  */
-cv::Mat Helper::as_image(cv::Mat const array, bool normalize) {
+cv::Mat Helper::asImage(cv::Mat const array, bool normalize) {
     cv::Mat tmp;
     cv::Mat img;
 
