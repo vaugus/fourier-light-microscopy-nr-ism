@@ -22,6 +22,12 @@ target_include_directories(ftiqa
         ${OpenCV_INCLUDE_DIRS}
 )
 
+configure_file(
+    ${CMAKE_SOURCE_DIR}/config.ini
+    ${CMAKE_BINARY_DIR}/config.ini
+    COPYONLY
+)
+
 target_link_libraries(ftiqa
     PUBLIC
         ${OpenCV_LIBS}
