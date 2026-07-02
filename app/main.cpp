@@ -3,6 +3,7 @@
 
 #include "ftiqa/image_util.hpp"
 #include "ftiqa/sample_function.hpp"
+#include "ftiqa/configuration.hpp"
 
 int main(int argc, char **argv) {
     if (argc != 3)
@@ -13,7 +14,9 @@ int main(int argc, char **argv) {
     
     try {
         std::string const path = argv[1];
-        
+
+        Configuration::instance().load();
+
         std::unique_ptr<SampleFunction> sample_processor = std::make_unique<SampleFunction>();
         
         std::vector<cv::Mat> img_vec = imageutil::loadDataset(path);
