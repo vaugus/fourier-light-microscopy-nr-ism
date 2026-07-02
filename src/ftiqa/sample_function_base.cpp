@@ -28,7 +28,9 @@
  * Default constructor.
  */
 SampleFunctionBase::SampleFunctionBase() {
-    this->initializeConstants(5, 110);
+    auto max_angle = Configuration::instance().getMaxAngle();
+    auto angle_step = Configuration::instance().getAngleStep();
+    this->initializeConstants(angle_step, max_angle);
 }
 
 /**
@@ -42,11 +44,11 @@ SampleFunctionBase::~SampleFunctionBase() {
  * Computes all cos and sin values for each of the given angles within the given
  * interval. Also sets the smallest vector size to "infinity". 
  */ 
-void SampleFunctionBase::initializeConstants(int const step, int const limit) {
+void SampleFunctionBase::initializeConstants(int const angle_step, int const max_angle) {
     setSmallestVectorSize(INT_MAX);
 
     // set this->cosines with the sequence {0,5,10,...,110}
-    for (int angle = 0; angle <= limit; angle += step) {
+    for (int angle = 0; angle <= max_angle; angle += angle_step) {
         this->cosines.emplace_back(angle);
         this->sines.emplace_back(angle);
     }
@@ -58,7 +60,6 @@ void SampleFunctionBase::initializeConstants(int const step, int const limit) {
     // compute the sines of each angle and store them in this->sines
     std::transform(this->sines.begin(), this->sines.end(), this->sines.begin(),
         [](double angle) -> double { return sin(angle * M_PI / 180.0); });
-
 }
 
 
@@ -75,11 +76,13 @@ void SampleFunctionBase::initializeConstants(int const step, int const limit) {
 void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     FFTUtils *fft_utils = new FFTUtils();
 
+    double resize_factor = Configuration::instance().getResizeFactor();
+
     // convert to grayscale colourspaces
     cv::Mat gray;
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
-    cv::Size size(image.cols / 2,  image.rows / 2);
+    cv::Size size(image.cols * resize_factor,  image.rows * resize_factor);
     cv::Mat tmp;
     cv::resize(gray, tmp, size);
 

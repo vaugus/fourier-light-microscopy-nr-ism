@@ -60,7 +60,7 @@ void StatisticalAnalysis::computeKurtosisAllCropSizes(std::vector<std::vector<do
 
 unsigned StatisticalAnalysis::findMaximumRange(std::vector<std::vector<double>> const& kurtosis_array) {
     unsigned ans = 0;
-    double maximum = DBL_MIN;
+    double maximum = Configuration::instance().getMinIqrValue();
 
     const unsigned size = kurtosis_array.size();
 
