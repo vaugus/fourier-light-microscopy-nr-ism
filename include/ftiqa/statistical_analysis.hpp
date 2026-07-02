@@ -12,6 +12,7 @@
 #define ANALYSIS_HPP
 
 #include <vector>
+#include <ftiqa/configuration.hpp>
 
 /**
  * Header file with a class for operations concerning 
