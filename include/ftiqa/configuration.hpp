@@ -31,10 +31,10 @@ public:
 
         while (std::getline(file, line))
         {
-            auto equals_delimiter = line.find('=');
+            auto equalsDelimiter = line.find('=');
 
-            std::string key = line.substr(0, equals_delimiter);
-            std::string value = line.substr(equals_delimiter + 1);
+            std::string key = line.substr(0, equalsDelimiter);
+            std::string value = line.substr(equalsDelimiter + 1);
 
             config[key] = std::stod(value);
         }
@@ -50,22 +50,22 @@ public:
     }
 
 
-    double getAngleStep() { return config["angle_step"]; }
+    double getAngleStep() { return config["angleStep"]; }
 
-    double getMaxAngle() { return config["max_angle"]; }
+    double getMaxAngle() { return config["maxAngle"]; }
 
-    double getResizeFactor() { return config["resize_factor"]; }
+    double getResizeFactor() { return config["resizeFactor"]; }
 
-    double getClaheClipLimit() { return config["clahe_clip_limit"]; }
+    double getClaheClipLimit() { return config["claheClipLimit"]; }
 
-    double getClaheTilesGridSize() { return config["clahe_tiles_grid_size"]; }
+    double getClaheTilesGridSize() { return config["claheTilesGridSize"]; }
 
-    double getMinIqrValue() { return config["min_iqr_value"]; }
+    double getMinIqrValue() { return config["minIqrValue"]; }
 
-    double getNumRadialVectors() { return config["num_radial_vectors"]; }
+    double getNumRadialVectors() { return config["numRadialVectors"]; }
 
     int getTotalAngles() {
-        // Including from -2 * max_angle to +2 * max_angle gives 2*2 * max_angle/angle_step + 1
+        // Including from -2 * maxAngle to +2 * maxAngle gives 2*2 * maxAngle/angleStep + 1
         
         // in this case, it means that the values were not initialized - return zero
         if (getMaxAngle() == 0.0 || getAngleStep() == 0.0) {
@@ -75,62 +75,61 @@ public:
         return static_cast<int>((2 * getMaxAngle()) / getAngleStep() + 1);
     }
 
-    void setAngleStep(double step) { config["angle_step"] = step; }
+    void setAngleStep(double step) { config["angleStep"] = step; }
 
     void setMaxAngle(double angle)
     {
-        config["max_angle"] = angle;
-        // Update num_radial_vectors accordingly
-        config["num_radial_vectors"] = (config["nmax_angle"] - static_cast<int>(config["angle_step"])) / static_cast<int>(config["angle_step"]) + 1;
+        config["maxAngle"] = angle;
+        // Update numRadialVectors accordingly
+        config["numRadialVectors"] = (config["maxAngle"] - static_cast<int>(config["angleStep"])) / static_cast<int>(config["angleStep"]) + 1;
     }
 
-    void setResizeFactor(double factor) { config["resize_factor"] = factor; }
+    void setResizeFactor(double factor) { config["resizeFactor"] = factor; }
 
-    void setClaheClipLimit(double limit) { config["clahe_clip_limit"] = limit; }
+    void setClaheClipLimit(double limit) { config["claheClipLimit"] = limit; }
 
-    void setClaheTilesGridSize(double size) { config["clahe_tiles_grid_size"] = size; }
+    void setClaheTilesGridSize(double size) { config["claheTilesGridSize"] = size; }
 
-    void setMinIqrValue(double value) { config["min_iqr_value"] = value; }
+    void setMinIqrValue(double value) { config["minIqrValue"] = value; }
 
-    void setNumRadialVectors(double num) { config["num_radial_vectors"] = num; }
+    void setNumRadialVectors(double num) { config["numRadialVectors"] = num; }
 
     /**
-     * @brief angle_step: FFT radial angle step in degrees
+     * @brief angleStep: FFT radial angle step in degrees
      * Default: 5 degrees
-     * 
-     * @brief max_angle: Maximum radial angle in degrees
+     * @brief maxAngle: Maximum radial angle in degrees
      * Default: 110 degrees
-     * @brief resize_factor: Factor by which to resize images before FFT
+     * @brief resizeFactor: Factor by which to resize images before FFT
      * Default: 0.5
-     * @brief clahe_clip_limit: CLAE clip limit for contrast enhancement
+     * @brief claheClipLimit: CLAE clip limit for contrast enhancement
      * Default: 2.0
-     * @brief clahe_tiles_grid_size: CLAE tile grid size
+     * @brief claheTilesGridSize: CLAE tile grid size
      * Default: 8
-     * @brief min_iqr_value: Minimum value for IQR calculation
+     * @brief minIqrValue: Minimum value for IQR calculation
      * Default: DBL_MIN equivalent (1e-16)
-     * @brief num_radial_vectors: Number of radial vectors (computed from angle step and max angle)
+     * @brief numRadialVectors: Number of radial vectors (computed from angle step and max angle)
      * Default: 22 (computed as (110 - 5) / 5 + 1 = 21, but typically 22 vectors)
      */
     void setDefaultValues()
     {
-        config["angle_step"] = 5.0f;
-        config["max_angle"] = 110;
-        config["resize_factor"] = 0.5f;
-        config["clahe_clip_limit"] = 2.0f;
-        config["clahe_tiles_grid_size"] = 8;
-        config["min_iqr_value"] = 1e-16;
-        config["num_radial_vectors"] = 22;
+        config["angleStep"] = 5.0f;
+        config["maxAngle"] = 110;
+        config["resizeFactor"] = 0.5f;
+        config["claheClipLimit"] = 2.0f;
+        config["claheTilesGridSize"] = 8;
+        config["minIqrValue"] = 1e-16;
+        config["numRadialVectors"] = 22;
     }
 
     void show()
     {
-        std::cout << "angle_step = " << getAngleStep() << std::endl;
-        std::cout << "max_angle = " << getMaxAngle() << std::endl;
-        std::cout << "resize_factor = " << getResizeFactor() << std::endl;
-        std::cout << "clahe_clip_limit = " << getClaheClipLimit() << std::endl;
-        std::cout << "clahe_tiles_grid_size = " << getClaheTilesGridSize() << std::endl;
-        std::cout << "min_iqr_value = " << getMinIqrValue() << std::endl;
-        std::cout << "num_radial_vectors = " << getNumRadialVectors() << std::endl;
+        std::cout << "angleStep = " << getAngleStep() << std::endl;
+        std::cout << "maxAngle = " << getMaxAngle() << std::endl;
+        std::cout << "resizeFactor = " << getResizeFactor() << std::endl;
+        std::cout << "claheClipLimit = " << getClaheClipLimit() << std::endl;
+        std::cout << "claheTilesGridSize = " << getClaheTilesGridSize() << std::endl;
+        std::cout << "minIqrValue = " << getMinIqrValue() << std::endl;
+        std::cout << "numRadialVectors = " << getNumRadialVectors() << std::endl;
     }
 private:
     Configuration() = default;

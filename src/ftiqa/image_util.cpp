@@ -8,13 +8,13 @@
 
 namespace imageutil
 {
-    std::vector<cv::Mat> loadDataset(const std::filesystem::path &dataset_file)
+    std::vector<cv::Mat> loadDataset(const std::filesystem::path &datasetFile)
     {
-        std::ifstream file(dataset_file);
+        std::ifstream file(datasetFile);
 
         if (!file)
         {
-            throw std::runtime_error("Cannot open dataset file: " + dataset_file.string());
+            throw std::runtime_error("Cannot open dataset file: " + datasetFile.string());
         }
 
         std::vector<cv::Mat> images;
