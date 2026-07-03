@@ -42,8 +42,8 @@ class SampleFunctionBase {
         /** @brief Destroys a SampleFunctionBase instance. */
         ~SampleFunctionBase();
 
-        /** @param smallest_vector_size     The smallest vector size to set.*/
-        void setSmallestVectorSize(const int smallest_vector_size);
+        /** @param size     The smallest vector size to set.*/
+        void setSmallestVectorSize(const int size);
         
         /** @return current smallest vector size.*/
         int getSmallestVectorSize();
@@ -60,11 +60,7 @@ class SampleFunctionBase {
          */
         cv::Point getCenter();
 
-        /** 
-         * @param xc    The x coordinate of the center point
-         * @param yc    The y coordinate of the center point.
-         */
-        void setRadialVectorMasks(std::vector<cv::Mat> const& radial_vector_masks);
+        void setRadialVectorMasks(std::vector<cv::Mat> const& masks);
         
         /** 
          * @return      A std::vector of cv::Mat objects with the radial vector masks
@@ -88,10 +84,10 @@ class SampleFunctionBase {
          * @brief Performs the Discrete Fourier Transform on the given image.
          *
          * @param image             The RGB image to be transformed.
-         * @param gray_spectrum     A reference to a cv::Mat object which will
+         * @param graySpectrum     A reference to a cv::Mat object which will
          *                          receive the Fourier spectrum of the image.
          */
-        virtual void fft(cv::Mat const &image, cv::Mat &gray_spectrum);
+        virtual void fft(cv::Mat const &image, cv::Mat &graySpectrum);
 
         /** 
          * @brief Creates the class' radial vector masks with the given n.
@@ -103,11 +99,11 @@ class SampleFunctionBase {
         /** 
          * @brief Computes the mean of each element from the descriptor.
          *
-         * @param masked_spectra    Each spectrum multiplied by each mask.
+         * @param maskedSpectra    Each spectrum multiplied by each mask.
          *
          * @return      The vector which represents the descriptor.
          */
-        std::vector<double> processRadialVectors(std::vector<cv::Mat> &masked_spectra);
+        std::vector<double> processRadialVectors(std::vector<cv::Mat> &maskedSpectra);
 
 
         /** 
@@ -128,14 +124,14 @@ class SampleFunctionBase {
         inline static std::vector<double> sines;
         
         /** Set of radial vector masks to be applied in spectra. */
-        inline static std::vector<cv::Mat> radial_vector_masks;
+        inline static std::vector<cv::Mat> radialVectorMasks;
         
         /** Set of the (x,y) positions of white points in each 
          *  radial vector mask. */
         inline static std::vector<std::vector<cv::Point>> indices;
         
         /** The smallest vector size among all radial vectors. */
-        inline static int smallest_vector_size;
+        inline static int smallestVectorSize;
         
         /** The center of the spectrum. */
         inline static cv::Point center;

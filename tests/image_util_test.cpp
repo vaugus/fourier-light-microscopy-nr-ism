@@ -15,31 +15,31 @@ using namespace cv::utils::logging;
 class ImageUtilTest : public ::testing::Test
 {
 protected:
-    std::string test_images_dir;
-    std::string test_dataset_file;
+    std::string testImagesDir;
+    std::string testDatasetFile;
 
     void SetUp() override
     {
-        test_images_dir = "/tmp/ftiqa_test_images";
-        test_dataset_file = "/tmp/ftiqa_test_images.txt";
+        testImagesDir = "/tmp/ftiqa_test_images";
+        testDatasetFile = "/tmp/ftiqa_test_images.txt";
 
         // Clean up any existing directories
-        if (std::filesystem::exists(test_images_dir))
+        if (std::filesystem::exists(testImagesDir))
         {
-            std::filesystem::remove_all(test_images_dir);
+            std::filesystem::remove_all(testImagesDir);
         }
     }
 
     void TearDown() override
     {
         // Clean up
-        if (std::filesystem::exists(test_images_dir))
+        if (std::filesystem::exists(testImagesDir))
         {
-            std::filesystem::remove_all(test_images_dir);
+            std::filesystem::remove_all(testImagesDir);
         }
-        if (std::filesystem::exists(test_dataset_file))
+        if (std::filesystem::exists(testDatasetFile))
         {
-            std::filesystem::remove(test_dataset_file);
+            std::filesystem::remove(testDatasetFile);
         }
     }
 };
@@ -56,11 +56,11 @@ static std::filesystem::path executable_path()
     return std::filesystem::path(buffer);
 }
 
-static void createTestImageDirectory(const std::string &test_image_directory) 
+static void createTestImageDirectory(const std::string &testImageDirectory) 
 {
-    if (!std::filesystem::exists(test_image_directory))
+    if (!std::filesystem::exists(testImageDirectory))
     {
-        std::filesystem::create_directory(test_image_directory);
+        std::filesystem::create_directory(testImageDirectory);
     }
 }
 
@@ -72,10 +72,10 @@ static void createTestImage(const std::string &filename, cv::Scalar color)
 }
 
 // Helper function to create test dataset file
-static void createTestDataset(const std::string &dataset_file, const std::vector<std::string> &image_paths)
+static void createTestDataset(const std::string &datasetFile, const std::vector<std::string> &imagePaths)
 {
-    std::ofstream file(dataset_file);
-    for (const auto &path : image_paths)
+    std::ofstream file(datasetFile);
+    for (const auto &path : imagePaths)
     {
         file << path << "\n";
     }
@@ -96,10 +96,10 @@ TEST_F(ImageUtilTest, LuminanceConversionBlueImage)
     EXPECT_EQ(gray.type(), CV_8UC1);
 
     // Verify luminance calculation for blue image
-    double pixel_value = gray.at<uchar>(50, 50);
+    double pixelValue = gray.at<uchar>(50, 50);
     // Should be in valid range
-    EXPECT_LE(pixel_value, 255);
-    EXPECT_GE(pixel_value, 0);
+    EXPECT_LE(pixelValue, 255);
+    EXPECT_GE(pixelValue, 0);
 }
 
 TEST_F(ImageUtilTest, LuminanceConversionWhiteImage)
@@ -111,8 +111,8 @@ TEST_F(ImageUtilTest, LuminanceConversionWhiteImage)
     cv::Mat gray = luminance(image);
 
     // White should have maximum luminance
-    double pixel_value = gray.at<uchar>(0, 0);
-    EXPECT_EQ(pixel_value, 255);
+    double pixelValue = gray.at<uchar>(0, 0);
+    EXPECT_EQ(pixelValue, 255);
 }
 
 TEST_F(ImageUtilTest, LuminanceConversionBlackImage)
@@ -124,8 +124,8 @@ TEST_F(ImageUtilTest, LuminanceConversionBlackImage)
     cv::Mat gray = luminance(image);
 
     // Black should have zero luminance
-    double pixel_value = gray.at<uchar>(0, 0);
-    EXPECT_EQ(pixel_value, 0);
+    double pixelValue = gray.at<uchar>(0, 0);
+    EXPECT_EQ(pixelValue, 0);
 }
 
 TEST_F(ImageUtilTest, LuminanceConversionRedImage)
@@ -169,25 +169,25 @@ TEST_F(ImageUtilTest, LuminanceConversionGrayImage)
 
 TEST_F(ImageUtilTest, LoadDatasetMultipleImages) {
     // Create test directory and images
-    test_images_dir = "/tmp/ftiqa_test_images2";
-    test_dataset_file = "/tmp/ftiqa_test_images2.txt";
+    testImagesDir = "/tmp/ftiqa_test_images2";
+    testDatasetFile = "/tmp/ftiqa_test_images2.txt";
 
     // Create test images
-    std::string image1 = test_images_dir + "/image1.png";
-    std::string image2 = test_images_dir + "/image2.png";
-    std::string image3 = test_images_dir + "/image3.png";
+    std::string image1 = testImagesDir + "/image1.png";
+    std::string image2 = testImagesDir + "/image2.png";
+    std::string image3 = testImagesDir + "/image3.png";
 
-    createTestImageDirectory(test_images_dir);
+    createTestImageDirectory(testImagesDir);
 
     createTestImage(image1, cv::Scalar(255, 0, 0));
     createTestImage(image2, cv::Scalar(0, 255, 0));
     createTestImage(image3, cv::Scalar(0, 0, 255));
 
     // Create dataset file
-    createTestDataset(test_dataset_file, {image1, image2, image3});
+    createTestDataset(testDatasetFile, {image1, image2, image3});
 
     // Load dataset
-    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(testDatasetFile);
 
     // Verify we loaded all images
     EXPECT_EQ(images.size(), 3u);
@@ -200,17 +200,17 @@ TEST_F(ImageUtilTest, LoadDatasetMultipleImages) {
 
 TEST_F(ImageUtilTest, LoadDatasetWithSingleImage) {
     // Create single image test
-    test_images_dir = "/tmp/ftiqa_test_images3";
-    test_dataset_file = "/tmp/ftiqa_test_images3.txt";
+    testImagesDir = "/tmp/ftiqa_test_images3";
+    testDatasetFile = "/tmp/ftiqa_test_images3.txt";
 
-    createTestImageDirectory(test_images_dir);
+    createTestImageDirectory(testImagesDir);
 
-    std::string single_image = test_images_dir + "/single.png";
-    createTestImage(single_image, cv::Scalar(128, 128, 128));
+    std::string singleImage = testImagesDir + "/single.png";
+    createTestImage(singleImage, cv::Scalar(128, 128, 128));
 
-    createTestDataset(test_dataset_file, {single_image});
+    createTestDataset(testDatasetFile, {singleImage});
 
-    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(testDatasetFile);
 
     EXPECT_EQ(images.size(), 1u);
     EXPECT_EQ(images[0].size(), cv::Size(100, 100));
@@ -218,11 +218,11 @@ TEST_F(ImageUtilTest, LoadDatasetWithSingleImage) {
 
 TEST_F(ImageUtilTest, LoadDatasetWithEmptyFile) {
     // Test with empty dataset file
-    test_dataset_file = "/tmp/ftiqa_test_images_empty.txt";
-    std::ofstream file(test_dataset_file);
+    testDatasetFile = "/tmp/ftiqa_test_images_empty.txt";
+    std::ofstream file(testDatasetFile);
     // Don't write anything, leave empty
 
-    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(testDatasetFile);
 
     // Empty file should load empty vector
     EXPECT_EQ(images.size(), 0u);
@@ -230,44 +230,44 @@ TEST_F(ImageUtilTest, LoadDatasetWithEmptyFile) {
 
 TEST_F(ImageUtilTest, LoadDatasetWithNonExistentFile) {
     // Test with non-existent file
-    test_dataset_file = "/nonexistent/path/to/images.txt";
+    testDatasetFile = "/nonexistent/path/to/images.txt";
 
-    EXPECT_THROW(loadDataset(test_dataset_file), std::runtime_error);
+    EXPECT_THROW(loadDataset(testDatasetFile), std::runtime_error);
 }
 
 TEST_F(ImageUtilTest, LoadDatasetWithInvalidImagePath) {
     // Create test file with one invalid image path
-    test_images_dir = "/tmp/ftiqa_test_images4";
-    test_dataset_file = "/tmp/ftiqa_test_images4.txt";
+    testImagesDir = "/tmp/ftiqa_test_images4";
+    testDatasetFile = "/tmp/ftiqa_test_images4.txt";
 
-    createTestImageDirectory(test_images_dir);
+    createTestImageDirectory(testImagesDir);
 
     // Create only one image
-    std::string valid_image = test_images_dir + "/valid.png";
-    createTestImage(valid_image, cv::Scalar(128, 128, 128));
+    std::string validImage = testImagesDir + "/valid.png";
+    createTestImage(validImage, cv::Scalar(128, 128, 128));
 
     // Add invalid path
-    createTestDataset(test_dataset_file, {valid_image, "/nonexistent/image.png"});
+    createTestDataset(testDatasetFile, {validImage, "/nonexistent/image.png"});
 
     auto oldLevel = getLogLevel();
     setLogLevel(LOG_LEVEL_SILENT);
 
     // Should throw exception
-    EXPECT_THROW(loadDataset(test_dataset_file), std::runtime_error);
+    EXPECT_THROW(loadDataset(testDatasetFile), std::runtime_error);
 
     setLogLevel(oldLevel);
 }
 
 TEST_F(ImageUtilTest, LoadDatasetWithEmptyLines) {
     // Test dataset file with empty lines at end
-    test_images_dir = "/tmp/ftiqa_test_images5";
-    test_dataset_file = "/tmp/ftiqa_test_images5.txt";
+    testImagesDir = "/tmp/ftiqa_test_images5";
+    testDatasetFile = "/tmp/ftiqa_test_images5.txt";
 
-    std::string image1 = test_images_dir + "/image1.png";
-    createTestImageDirectory(test_images_dir);
+    std::string image1 = testImagesDir + "/image1.png";
+    createTestImageDirectory(testImagesDir);
     createTestImage(image1, cv::Scalar(128, 128, 128));
 
-    std::ofstream file(test_dataset_file);
+    std::ofstream file(testDatasetFile);
     file << image1 << "\n";
     file << "\n";  // Empty line
     file << "\n";  // Another empty line
@@ -277,32 +277,32 @@ TEST_F(ImageUtilTest, LoadDatasetWithEmptyLines) {
     setLogLevel(LOG_LEVEL_SILENT);
     
     // Should throw exception
-    EXPECT_THROW(loadDataset(test_dataset_file), std::runtime_error);
+    EXPECT_THROW(loadDataset(testDatasetFile), std::runtime_error);
 
     setLogLevel(oldLevel);
 }
 
 TEST_F(ImageUtilTest, LoadDatasetLargeDataset) {
     // Create a larger dataset to test performance and handling
-    test_images_dir = "/tmp/ftiqa_test_images6";
-    test_dataset_file = "/tmp/ftiqa_test_images6.txt";
+    testImagesDir = "/tmp/ftiqa_test_images6";
+    testDatasetFile = "/tmp/ftiqa_test_images6.txt";
 
-    const size_t number_of_images = 5000;
-    std::vector<std::string> image_paths;
+    const size_t numberOfImage = 5000;
+    std::vector<std::string> imagePaths;
 
-    createTestImageDirectory(test_images_dir);
-    for (size_t i = 0; i < number_of_images; ++i) {
-        std::string image = test_images_dir + "/img_" + std::to_string(i) + ".png";
+    createTestImageDirectory(testImagesDir);
+    for (size_t i = 0; i < numberOfImage; ++i) {
+        std::string image = testImagesDir + "/img_" + std::to_string(i) + ".png";
         createTestImage(image, cv::Scalar(128 + i % 128, 128, 128));
-        image_paths.push_back(image);
+        imagePaths.push_back(image);
     }
 
-    createTestDataset(test_dataset_file, image_paths);
+    createTestDataset(testDatasetFile, imagePaths);
 
-    std::vector<cv::Mat> images = loadDataset(test_dataset_file);
+    std::vector<cv::Mat> images = loadDataset(testDatasetFile);
 
     // Verify we loaded all images
-    EXPECT_EQ(images.size(), number_of_images);
+    EXPECT_EQ(images.size(), numberOfImage);
 }
 
 TEST_F(ImageUtilTest, LuminanceLargeImage) {
@@ -321,9 +321,9 @@ TEST_F(ImageUtilTest, LuminanceLargeImage) {
 
 TEST_F(ImageUtilTest, LuminanceNonSquareImage) {
     // Test luminance with non-square images
-    cv::Mat non_square(100, 200, CV_8UC3, cv::Scalar(100, 150, 200));
+    cv::Mat nonSquare(100, 200, CV_8UC3, cv::Scalar(100, 150, 200));
 
-    cv::Mat result = luminance(non_square);
+    cv::Mat result = luminance(nonSquare);
 
     EXPECT_EQ(result.rows, 100);
     EXPECT_EQ(result.cols, 200);
@@ -363,21 +363,21 @@ TEST_F(ImageUtilTest, LuminanceVeryTallImage) {
 
 
 TEST_F(ImageUtilTest, LuminanceAirplane) {
-    auto repository_root = executable_path().parent_path().parent_path(); 
-    auto original_path = repository_root.string() + "/datasets/airplane/shrinking_kernel/10.png";
-    auto grayscale_path = repository_root.string() + "/datasets/airplane/shrinking_kernel/grayscale.png";
+    auto repositoryRoot = executable_path().parent_path().parent_path(); 
+    auto originalPath = repositoryRoot.string() + "/datasets/airplane/shrinking_kernel/10.png";
+    auto grayscalePath = repositoryRoot.string() + "/datasets/airplane/shrinking_kernel/grayscale.png";
 
-    auto original = cv::imread(original_path);
+    auto original = cv::imread(originalPath);
 
     // the grayscale.png airplane image was converted with ffmpeg.
-    auto expected = cv::imread(grayscale_path);
-    cv::Mat one_channel_expected;
-    cv::extractChannel(expected, one_channel_expected, 0);
+    auto expected = cv::imread(grayscalePath);
+    cv::Mat oneChannelExpected;
+    cv::extractChannel(expected, oneChannelExpected, 0);
 
     cv::Mat actual = luminance(original);
 
     // Small numerical differences
-    double maxDiff = cv::norm(one_channel_expected, actual, cv::NORM_INF);
+    double maxDiff = cv::norm(oneChannelExpected, actual, cv::NORM_INF);
     EXPECT_LE(maxDiff, 1.0);
 
     // Peak Signal-to-Noise Ratio
@@ -385,6 +385,6 @@ TEST_F(ImageUtilTest, LuminanceAirplane) {
     // 50 dB: almost identical
     // 40 – 50 dB: excellent
     // 30 – 40 dB: noticeable but small differences
-    double psnr = cv::PSNR(one_channel_expected, actual);
+    double psnr = cv::PSNR(oneChannelExpected, actual);
     EXPECT_GT(psnr, 50.0);
 }

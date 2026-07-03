@@ -28,9 +28,10 @@
  * Default constructor.
  */
 SampleFunctionBase::SampleFunctionBase() {
-    auto max_angle = Configuration::instance().getMaxAngle();
-    auto angle_step = Configuration::instance().getAngleStep();
-    this->initializeConstants(angle_step, max_angle);
+    auto angleStep = Configuration::instance().getAngleStep();
+    auto maxAngle = Configuration::instance().getMaxAngle();
+    this->initializeConstants(angleStep, maxAngle);
+    setSmallestVectorSize(INT_MAX);
 }
 
 /**
@@ -44,11 +45,10 @@ SampleFunctionBase::~SampleFunctionBase() {
  * Computes all cos and sin values for each of the given angles within the given
  * interval. Also sets the smallest vector size to "infinity". 
  */ 
-void SampleFunctionBase::initializeConstants(int const angle_step, int const max_angle) {
-    setSmallestVectorSize(INT_MAX);
+void SampleFunctionBase::initializeConstants(int const angleStep, int const maxAngle) {
 
     // set this->cosines with the sequence {0,5,10,...,110}
-    for (int angle = 0; angle <= max_angle; angle += angle_step) {
+    for (int angle = 0; angle <= maxAngle; angle += angleStep) {
         this->cosines.emplace_back(angle);
         this->sines.emplace_back(angle);
     }
@@ -71,18 +71,18 @@ void SampleFunctionBase::initializeConstants(int const angle_step, int const max
  * then the DFT is computed.
  *
  * @param image             The image to be transformed.
- * @param gray_spectrum     A Mat object to store the DFT result.
+ * @param graySpectrum     A Mat object to store the DFT result.
  */
-void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
-    FFTUtils *fft_utils = new FFTUtils();
+void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &graySpectrum) {
+    FFTUtils *fftUtils = new FFTUtils();
 
-    double resize_factor = Configuration::instance().getResizeFactor();
+    double resizeFactor = Configuration::instance().getResizeFactor();
 
     // convert to grayscale colourspaces
     cv::Mat gray;
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
-    cv::Size size(image.cols * resize_factor,  image.rows * resize_factor);
+    cv::Size size(image.cols * resizeFactor,  image.rows * resizeFactor);
     cv::Mat tmp;
     cv::resize(gray, tmp, size);
 
@@ -91,14 +91,14 @@ void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &gray_spectrum) {
     clahe->apply(tmp, dst);
 
     // perform the fft on the converted images
-    gray_spectrum = fft_utils->fft2(dst);
+    graySpectrum = fftUtils->fft2(dst);
 
     // clear some memory from the read images
     tmp.release();
     dst.release();
     gray.release();
 
-    delete fft_utils;
+    delete fftUtils;
 }
 
 /**
@@ -195,7 +195,7 @@ void SampleFunctionBase::generateRadialVectors(const int n) {
  * descriptor in the subsequent stages.  
  */ 
 std::vector<cv::Mat> SampleFunctionBase::applyRadialVectorMasks(cv::Mat const &spectrum) {
-    std::vector<cv::Mat> masked_spectra;
+    std::vector<cv::Mat> maskedSpectra;
     cv::Mat tmp;
 
     std::vector<cv::Mat> masks = getRadialVectorMasks();
@@ -203,11 +203,11 @@ std::vector<cv::Mat> SampleFunctionBase::applyRadialVectorMasks(cv::Mat const &s
     std::vector<cv::Mat>::iterator it;
     for (it = std::begin(masks); it != std::end(masks); ++it) {
         spectrum.copyTo(tmp, *it);
-        masked_spectra.emplace_back(tmp);
+        maskedSpectra.emplace_back(tmp);
         tmp.release();
     }
 
-    return masked_spectra;
+    return maskedSpectra;
 }
 
 /**
@@ -215,7 +215,7 @@ std::vector<cv::Mat> SampleFunctionBase::applyRadialVectorMasks(cv::Mat const &s
  * an one-dimensional vector, then divides every element by the count of all
  * vectors. 
  */ 
-std::vector<double> SampleFunctionBase::processRadialVectors(std::vector<cv::Mat> &masked_spectra) {
+std::vector<double> SampleFunctionBase::processRadialVectors(std::vector<cv::Mat> &maskedSpectra) {
     std::vector<double> sum(getSmallestVectorSize());
 
     std::vector<cv::Mat>::iterator masked;
@@ -223,7 +223,7 @@ std::vector<double> SampleFunctionBase::processRadialVectors(std::vector<cv::Mat
 
     // obtain all the masked pixels and sum them
     for (auto const& elem : getIndices()) {
-        for (masked = masked_spectra.begin(); masked != masked_spectra.end(); ++masked) {
+        for (masked = maskedSpectra.begin(); masked != maskedSpectra.end(); ++masked) {
             tmp = *masked;
             
             for (unsigned i = 0; i < elem.size(); i++) {
@@ -248,8 +248,8 @@ std::vector<double> SampleFunctionBase::processRadialVectors(std::vector<cv::Mat
  * of a spectrum in the form of vector<double>.
  */
 std::vector<double> SampleFunctionBase::computeSampleFunction(cv::Mat const &spectrum) {
-    std::vector<cv::Mat> masked_spectra = applyRadialVectorMasks(spectrum);
-    std::vector<double> sum = processRadialVectors(masked_spectra);
+    std::vector<cv::Mat> maskedSpectra = applyRadialVectorMasks(spectrum);
+    std::vector<double> sum = processRadialVectors(maskedSpectra);
     return sum;
 }
 
@@ -260,12 +260,12 @@ std::vector<double> SampleFunctionBase::computeSampleFunction(cv::Mat const &spe
  *******************************************************************
  *******************************************************************
  */
-void SampleFunctionBase::setSmallestVectorSize(int smallest_vector_size) {
-    this->smallest_vector_size = smallest_vector_size;
+void SampleFunctionBase::setSmallestVectorSize(int size) {
+    smallestVectorSize = size;
 }
 
 int SampleFunctionBase::getSmallestVectorSize() {
-    return this->smallest_vector_size;
+    return smallestVectorSize;
 }
 
 
@@ -277,13 +277,13 @@ cv::Point SampleFunctionBase::getCenter() {
     return this->center;
 }
 
-void SampleFunctionBase::setRadialVectorMasks(std::vector<cv::Mat> const& radial_vector_masks) {
-    this->radial_vector_masks = radial_vector_masks;
+void SampleFunctionBase::setRadialVectorMasks(std::vector<cv::Mat> const& masks) {
+    radialVectorMasks = masks;
 }
 
 
 std::vector<cv::Mat> SampleFunctionBase::getRadialVectorMasks() {
-    return this->radial_vector_masks;
+    return radialVectorMasks;
 }
 
 void SampleFunctionBase::setIndices(std::vector<std::vector<cv::Point>> &indices) {
@@ -292,5 +292,5 @@ void SampleFunctionBase::setIndices(std::vector<std::vector<cv::Point>> &indices
 
 
 std::vector<std::vector<cv::Point>> SampleFunctionBase::getIndices() {
-    return this->indices;
+    return indices;
 }

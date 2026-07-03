@@ -60,8 +60,8 @@ void SampleFunction::runBatchFFT(std::vector<cv::Mat> &img_vec) {
     
     analysis->computeDatasetIqr(data, crop);
     
-    // writer->setFilename("output/descriptor/dataset.csv");
-    // writer->writeFFTDescriptorDataset(coefficients);
+    writer->setFilename("output/descriptor/dataset.csv");
+    writer->writeFFTDescriptorDataset(coefficients);
 
     img_vec.clear();
     delete writer;

@@ -17,12 +17,12 @@ int main(int argc, char **argv) {
 
         Configuration::instance().load();
 
-        std::unique_ptr<SampleFunction> sample_processor = std::make_unique<SampleFunction>();
+        std::unique_ptr<SampleFunction> sampleProcessor = std::make_unique<SampleFunction>();
         
-        std::vector<cv::Mat> img_vec = imageutil::loadDataset(path);
+        std::vector<cv::Mat> images = imageutil::loadDataset(path);
 
-        sample_processor->runBatchFFT(img_vec);
-        img_vec.clear();
+        sampleProcessor->runBatchFFT(images);
+        images.clear();
     } catch (const std::exception& e) {
         std::cerr << "An exception occurred during execution: " << e.what() << std::endl;
         return 1;
