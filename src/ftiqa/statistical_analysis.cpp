@@ -26,7 +26,7 @@ using namespace std;
  */
 void StatisticalAnalysis::computeKurtosisAllCropSizes(std::vector<std::vector<double>> const& dataset,
                                              std::vector<std::vector<double>> &probabilities,
-                                             std::vector<std::vector<double>> &kurtosis_array) {
+                                             std::vector<std::vector<double>> &kurtosisArray) {
     
     std::copy(dataset.begin(), dataset.end(), back_inserter(probabilities)); 
 
@@ -40,29 +40,29 @@ void StatisticalAnalysis::computeKurtosisAllCropSizes(std::vector<std::vector<do
         });
     }
 
-    const unsigned crop_sizes = probabilities[0].size();
+    const unsigned cropSizes = probabilities[0].size();
 
-    std::vector<double> tmp_probability;
-    std::vector<double> tmp_kurtosis;
+    std::vector<double> tmpProbability;
+    std::vector<double> tmpKurtosis;
     std::vector<unsigned>::iterator crop;
 
-    for (unsigned crop = 0; crop < crop_sizes; crop++) {
+    for (unsigned crop = 0; crop < cropSizes; crop++) {
         for (auto prob: probabilities) {
-            tmp_probability = std::vector<double>(prob.begin() + crop, prob.end());
-            tmp_kurtosis.emplace_back(kurtosis(tmp_probability));
+            tmpProbability = std::vector<double>(prob.begin() + crop, prob.end());
+            tmpKurtosis.emplace_back(kurtosis(tmpProbability));
         }
 
-        kurtosis_array.emplace_back(tmp_kurtosis);
-        tmp_kurtosis.clear();
+        kurtosisArray.emplace_back(tmpKurtosis);
+        tmpProbability.clear();
     }
 }
 
 
-unsigned StatisticalAnalysis::findMaximumRange(std::vector<std::vector<double>> const& kurtosis_array) {
+unsigned StatisticalAnalysis::findMaximumRange(std::vector<std::vector<double>> const& kurtosisArray) {
     unsigned ans = 0;
     double maximum = Configuration::instance().getMinIqrValue();
 
-    const unsigned size = kurtosis_array.size();
+    const unsigned size = kurtosisArray.size();
 
     std::vector<double> row;
     double max = 0;
@@ -70,7 +70,7 @@ unsigned StatisticalAnalysis::findMaximumRange(std::vector<std::vector<double>> 
     double ptp = 0;
 
     for (unsigned crop = 0; crop < size; crop++) {
-        row = kurtosis_array.at(crop);
+        row = kurtosisArray.at(crop);
 
         max = *std::max_element(row.begin(), row.end());
         min = *std::min_element(row.begin(), row.end());

@@ -28,7 +28,7 @@ class SampleFunction : public SampleFunctionBase {
 
     public:
 
-        void runBatchFFT(std::vector<cv::Mat> &img_vec);
+        void runBatchFFT(std::vector<cv::Mat> &images);
         void sortEnergyDistances(std::vector<std::pair<int, double>> &arr);
 
     private:

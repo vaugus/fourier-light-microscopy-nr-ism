@@ -32,9 +32,9 @@ class StatisticalAnalysis {
     
         void computeKurtosisAllCropSizes(std::vector<std::vector<double>> const& dataset,
                                              std::vector<std::vector<double>> &probabilities,
-                                             std::vector<std::vector<double>> &kurtosis_array);
+                                             std::vector<std::vector<double>> &kurtosisArray);
 
-        unsigned findMaximumRange(std::vector<std::vector<double>> const& kurtosis_array);
+        unsigned findMaximumRange(std::vector<std::vector<double>> const& kurtosisArray);
 
     private:
 
