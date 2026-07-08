@@ -87,7 +87,7 @@ class SampleFunctionBase {
          * @param graySpectrum     A reference to a cv::Mat object which will
          *                          receive the Fourier spectrum of the image.
          */
-        virtual void fft(cv::Mat const &image, cv::Mat &graySpectrum);
+        virtual void fft(cv::Mat image, cv::Mat &graySpectrum);
 
         /** 
          * @brief Creates the class' radial vector masks with the given n.

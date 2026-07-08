@@ -73,32 +73,22 @@ void SampleFunctionBase::initializeConstants(int const angleStep, int const maxA
  * @param image             The image to be transformed.
  * @param graySpectrum     A Mat object to store the DFT result.
  */
-void SampleFunctionBase::fft(cv::Mat const &image, cv::Mat &graySpectrum) {
-    FFTUtils *fftUtils = new FFTUtils();
+void SampleFunctionBase::fft(cv::Mat image, cv::Mat &graySpectrum) {
+    auto fftUtils = std::make_unique<FFTUtils>();
 
     double resizeFactor = Configuration::instance().getResizeFactor();
 
     // convert to grayscale colourspaces
-    cv::Mat gray;
-    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
 
     cv::Size size(image.cols * resizeFactor,  image.rows * resizeFactor);
-    cv::Mat tmp;
-    cv::resize(gray, tmp, size);
+    cv::resize(image, image, size);
 
     cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
-    cv::Mat dst;
-    clahe->apply(tmp, dst);
+    clahe->apply(image, image);
 
-    // perform the fft on the converted images
-    graySpectrum = fftUtils->fft2(dst);
-
-    // clear some memory from the read images
-    tmp.release();
-    dst.release();
-    gray.release();
-
-    delete fftUtils;
+    // perform the fft on the converted image
+    graySpectrum = fftUtils->fft2(image);
 }
 
 /**
