@@ -186,15 +186,12 @@ void SampleFunctionBase::generateRadialVectors(const int n) {
  */ 
 std::vector<cv::Mat> SampleFunctionBase::applyRadialVectorMasks(cv::Mat const &spectrum) {
     std::vector<cv::Mat> maskedSpectra;
-    cv::Mat tmp;
-
     std::vector<cv::Mat> masks = getRadialVectorMasks();
 
-    std::vector<cv::Mat>::iterator it;
-    for (it = std::begin(masks); it != std::end(masks); ++it) {
-        spectrum.copyTo(tmp, *it);
-        maskedSpectra.emplace_back(tmp);
-        tmp.release();
+    for (auto const& mask : masks) {
+        cv::Mat maskedSpectrum;
+        spectrum.copyTo(maskedSpectrum, mask);
+        maskedSpectra.emplace_back(std::move(maskedSpectrum));
     }
 
     return maskedSpectra;
