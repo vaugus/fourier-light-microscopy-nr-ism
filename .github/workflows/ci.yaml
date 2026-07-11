@@ -1,4 +1,4 @@
-name: CMake Build
+name: 'CMake build, run unit tests with Googletest and run e2e test'
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - '*'
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,5 +35,16 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Test
+      - name: Run unit tests
         run: ./build/unit_tests
+
+      - name: Write shrinking kernel test input file
+        run: |
+          for ((i = 1 ; i <= 10 ; i++)); do
+          tee -a ./build/e2e_test.txt <<EOF
+          $(pwd)/datasets/airplane/shrinking_kernel/$i.png
+          EOF
+          done
+
+      - name: Run e2e Tests
+        run: ./build/main ./build/e2e_test.txt foo
