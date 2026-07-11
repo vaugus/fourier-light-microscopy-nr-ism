@@ -24,9 +24,6 @@
 
 #include "ftiqa/fft_utils.hpp"
 
-/**
- * Default constructor.
- */
 SampleFunctionBase::SampleFunctionBase() {
     auto angleStep = Configuration::instance().getAngleStep();
     auto maxAngle = Configuration::instance().getMaxAngle();
@@ -34,12 +31,8 @@ SampleFunctionBase::SampleFunctionBase() {
     setSmallestVectorSize(INT_MAX);
 }
 
-/**
- * Default destructor.
- */    
 SampleFunctionBase::~SampleFunctionBase() {
 }
-
 
 /**
  * Computes all cos and sin values for each of the given angles within the given
@@ -98,9 +91,9 @@ void SampleFunctionBase::fft(cv::Mat image, cv::Mat &graySpectrum) {
 void SampleFunctionBase::cropIndices() {
     std::vector<std::vector<cv::Point>> indices = getIndices();
 
-    // crop all the indices until they have the 'lst' size
-    for (auto &elem: indices) {
-        elem.resize(getSmallestVectorSize());
+    // crop all the indices until they have the 'smallest' size
+    for (auto &index: indices) {
+        index.resize(getSmallestVectorSize());
     }
 
     setIndices(indices);
@@ -115,67 +108,53 @@ void SampleFunctionBase::cropIndices() {
  *              the Fourier Transform.
  */
 void SampleFunctionBase::generateRadialVectors(const int n) {
-    const cv::Mat zeros = cv::Mat::zeros(n, n, CV_8UC1);
-
     const unsigned radius = unsigned(n / 2);
     
     setCenter(radius, radius);
 
-    cv::Point p2;
+    cv::Point head;
 
-    // Mat object to hold the indices of non-zero points
-    // among the mask.
-    cv::Mat indices;
-
-    // Mat object for finding the indices of the non-zero 
-    // points among the mask.
-    cv::Mat tmp_mask;    
+    std::vector<std::vector<cv::Point>> indices;
+    std::vector<cv::Mat> radialVectorMasks;
     
-    std::vector<cv::Point> tmp_white_points;
-    std::vector<std::vector<cv::Point>> tmp_indices;
-    std::vector<cv::Mat> tmp_radial_vector_masks;
-
     for (std::size_t i = 0; i < this->cosines.size(); i++) {
+        std::vector<cv::Point> whitePoints;
 
         // calculate the end point of the vector, based on the angle
-        p2.x = (int)round(center.x + radius * this->cosines[i]);
-        p2.y = (int)round(center.y + radius * this->sines[i]);
+        head.x = (int)round(center.x + radius * this->cosines[i]);
+        head.y = (int)round(center.y + radius * this->sines[i]);
 
-        tmp_mask = zeros.clone();
-        
-        // draw the line 
-        cv::line(tmp_mask,
+        // draw the line
+        cv::Mat line = cv::Mat::zeros(n, n, CV_8UC1);
+        cv::line(line,
                  getCenter(),
-                 p2,
+                 head,
                  cv::Scalar(255, 255, 255),
                  1,
                  16);
 
         // get all the indices from the vector
-        for (int i = 0; i < tmp_mask.rows; i++) {
-            const unsigned char* elem = tmp_mask.ptr<unsigned char>(i);
+        for (int i = 0; i < line.rows; i++) {
+            const unsigned char* elem = line.ptr<unsigned char>(i);
            
-            for (int j = 0; j < tmp_mask.cols; j++) {
+            for (int j = 0; j < line.cols; j++) {
                 if (elem[j] != 0) {
-                    tmp_white_points.emplace_back(cv::Point(i, j));
+                    whitePoints.emplace_back(cv::Point(i, j));
                 }
             }
         }
 
         // get the smallest vector
-        if (tmp_white_points.size() < static_cast<std::size_t>(getSmallestVectorSize())) {
-            setSmallestVectorSize(tmp_white_points.size());
+        if (whitePoints.size() < static_cast<std::size_t>(getSmallestVectorSize())) {
+            setSmallestVectorSize(whitePoints.size());
         }
 
-        tmp_radial_vector_masks.emplace_back(tmp_mask);
-        tmp_indices.emplace_back(tmp_white_points);
-
-        tmp_white_points.clear();
-        tmp_mask.release();
+        radialVectorMasks.emplace_back(line);
+        indices.emplace_back(whitePoints);
     }
 
-    setRadialVectorMasks(tmp_radial_vector_masks);
-    setIndices(tmp_indices);
+    setRadialVectorMasks(radialVectorMasks);
+    setIndices(indices);
     cropIndices();
 }
 
@@ -205,26 +184,19 @@ std::vector<cv::Mat> SampleFunctionBase::applyRadialVectorMasks(cv::Mat const &s
 std::vector<double> SampleFunctionBase::processRadialVectors(std::vector<cv::Mat> &maskedSpectra) {
     std::vector<double> sum(getSmallestVectorSize());
 
-    std::vector<cv::Mat>::iterator masked;
-    cv::Mat tmp;
-
     // obtain all the masked pixels and sum them
-    for (auto const& elem : getIndices()) {
-        for (masked = maskedSpectra.begin(); masked != maskedSpectra.end(); ++masked) {
-            tmp = *masked;
-            
-            for (unsigned i = 0; i < elem.size(); i++) {
-                sum[i] += tmp.at<double>(elem[i]);
+    for (auto const& index : getIndices()) {
+        for (auto maskedSpectrum : maskedSpectra) {
+            for (unsigned i = 0; i < index.size(); i++) {
+                sum[i] += maskedSpectrum.at<double>(index[i]);
             }
-            
-            tmp.release();
         }
     }
 
     // divide all elements by the number of vectors taken
-    const double k = getIndices().size();
+    const double numberOfVectors = getIndices().size();
     std::transform(sum.begin(), sum.end(), sum.begin(), 
-        [k](double& c) { return c / k; });
+        [numberOfVectors](double& element) { return element / numberOfVectors; });
 
     return sum;
 } 
@@ -241,12 +213,6 @@ std::vector<double> SampleFunctionBase::computeSampleFunction(cv::Mat const &spe
 }
 
 
-/*******************************************************************
- *******************************************************************
- * Getter and Setter methods.
- *******************************************************************
- *******************************************************************
- */
 void SampleFunctionBase::setSmallestVectorSize(int size) {
     smallestVectorSize = size;
 }
